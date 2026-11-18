@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sangre, Foxtrot y Lágrimas - Gato Tuerto</title>
+    <style>
+        body { background-color: #121212; color: #e0e0e0; font-family: 'Georgia', serif; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #c5a059; }
+        h1, h2 { color: #c5a059; text-align: center; }
+        button { background: #c5a059; color: #121212; border: none; padding: 10px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; }
+        button:hover { background: #d4af37; }
+        select, input { width: 100%; padding: 10px; margin-top: 10px; background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 4px; }
+        .hidden { display: none; }
+        .card { background: #252525; padding: 15px; margin-top: 15px; border-left: 4px solid #c5a059; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cabaret El Gato Tuerto</h1>
+        <h2>Misterio en los Años 20</h2>
+        
+        <div id="login-section">
+            <p>Introduce tu código de personaje asignado para entrar en el dossier secreto:</p>
+            <select id="char-select">
+                <option value="">-- Selecciona tu personaje --</option>
+                <option value="damian">Damián "El Santo" Valdés</option>
+                <option value="vera">Vera de la Vega</option>
+                <option value="silvana">Silvana "La Muda" Gaultier</option>
+                <option value="mateo">Mateo "El Porteño" Rossi</option>
+                <option value="dafne">Dafne "La Sirena" Mourlot</option>
+                <option value="axel">Axel "El Tuercas" Vane</option>
+                <option value="beatrice">Dra. Beatrice Sola</option>
+                <option value="julian">Julian "El Sombra" Croft</option>
+                <option value="ylva">Ylva "La Nórdica" Lindqvist</option>
+                <option value="thiago">Thiago "El Carioca" Da Silva</option>
+            </select>
+            <button onclick="login()">Acceder al Dossier</button>
+        </div>
+
+        <div id="game-section" class="hidden">
+            <h3 id="char-title"></h3>
+            <div class="card">
+                <h4>Tu Fachada Pública</h4>
+                <p id="char-fachada"></p>
+            </div>
+            <div class="card" style="border-left-color: #a93226;">
+                <h4>Tu Secreto Oscuro</h4>
+                <p id="char-secreto"></p>
+            </div>
+            <div class="card" style="border-left-color: #2e86c1;">
+                <h4>Tu Frase Clave</h4>
+                <p id="char-frase" style="font-style: italic;"></p>
+            </div>
+            <div class="card" id="killer-reveal" style="border-left-color: #ff0000; display:none;">
+                <h4>⚠️ MENSAJE ULTIMATUM (RONDA FINAL)</h4>
+                <p id="killer-text"></p>
+            </div>
+            <button onclick="location.reload()" style="background: #444; color: #fff; margin-top: 20px;">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script>
+        const characters = {
+            damian: { title: "Damián 'El Santo' Valdés", fachada: "El alma de la fiesta, sonriente, pasota que deja tomar decisiones a su mujer.", secreto: "Inversor fantasma en la quiebra de los astilleros del puerto; Blackwood te exigía el 80% o destapaba tu fraude.", frase: "'Hombre, ¿matar yo a Barnaby? ¡Si con lo mal que llevo la contabilidad, hacer cuentas va contra mi filosofía!'" },
+            vera: { title: "Vera de la Vega", fachada: "Hiperactiva, vibrante, arrastra a todo el mundo al baile y a escuchar música industrial.", secreto: "Firmaste letras de cambio con tu piso como aval. Mantienes un idilio secreto e inconfesable con el marido de otra.", frase: "'¡La vida son dos días, y si la música industrial no ahogara los gritos de este antro, ya me habría tirado!'" },
+            silvana: { title: "Silvana 'La Muda' Gaultier", fachada: "Artista gráfica austera, humilde y agradecida que presta su casa para todo.", secreto: "Eres obscenamente rica (heredera del caucho); falsificaste tu ruina y coleccionas sintetizadores de vanguardia.", frase: "'Yo solo soy una pobre ilustradora, por el amor de Dios... ¡si apenas tengo para disolvente de óleos!'" },
+            mateo: { title: "Mateo 'El Porteño' Rossi", fachada: "Inmigrante argentino canchero, fiestero y buscavidas con un cigarrillo en la boca.", secreto: "Contrabandista de puros habanos; le robaste un cargamento entero a Blackwood que este te iba a confiscar.", frase: "'Che, ¿yo? ¡A mí el viejo me caía pesado, pero jamás le robaría ni un triste puro a nadie!'" },
+            dafne: { title: "Dafne 'La Sirena' Mourlot", fachada: "Administrativa de baja por 'brazo roto', voluptuosa y la que lleva los pantalones.", secreto: "El brazo roto es un fraude de seguro; intentaste robar las joyas de la caja fuerte de Blackwood.", frase: "'Mirad mi brazo, incapaz soy de alzar un pisapapeles para reventarle la crisma a nadie!'" },
+            axel: { title: "Axel 'El Tuercas' Vane", fachada: "Mecánico silencioso hiperenfocado en su Ford Model A de carreras clandestinas.", secreto: "Blindabas los coches de la banda de Blackwood; este iba a delatar a toda su red ante la policía.", frase: "'Un buen motor de Ford Model A no hace ruido; el difunto aceleraba demasiado y gripó el motor.'" },
+            beatrice: { title: "Dra. Beatrice Sola", fachada: "Psiquiatra formal, analítica, madre reciente con compostura de acero.", secreto: "Usabas sedantes del sanatorio para robar pagarés a Blackwood y financiar tu nueva vida familiar.", frase: "'Como psiquiatra os aseguro que el único desequilibrado en esta sala era el difunto.'" },
+            julian: { title: "Julian 'El Sombra' Croft", fachada: "Marido de Beatrice, enigmático, extremadamente silencioso y discreto.", secreto: "Expolicía corrupto y matón de Blackwood; robaste la caja fuerte la misma noche del crimen.", frase: "'En mi antigua profesión aprendí algo: el que habla demasiado no ve nada. Y yo no vi nada.'" },
+            ylva: { title: "Ylva 'La Nórdica' Lindqvist", fachada: "Lituana rubia que 'apenas entiende el español', sonriente y fan de la electrónica.", secreto: "Espía industrial internacional; Blackwood descubrió tu identidad y te exigía 10.000 dólares oro.", frase: "'¿Mande? Yo no hablar bien español... ¿Quién es ese Barnaby? ¿Es un tipo de queso?'" },
+            thiago: { title: "Thiago 'El Carioca' Da Silva", fachada: "Brasileño recién llegado tras una boda exprés secreta, sonriente y desubicado.", secreto: "Prófugo de la justicia internacional; usabas el cabaret para blanquear dinero de apuestas clandestinas.", frase: "'Rapaziada, eu no tengo nada que ver! Acabo de aterrizar y ni sé dónde se compra el pan.'" }
+        };
+
+        function login() {
+            const select = document.getElementById('char-select').value;
+            if(!select) { alert('Selecciona un personaje'); return; }
+            
+            const char = characters[select];
+            document.getElementById('char-title').innerText = char.title;
+            document.getElementById('char-fachada').innerText = char.fachada;
+            document.getElementById('char-secreto').innerText = char.secreto;
+            document.getElementById('char-frase').innerText = char.frase;
+
+            // Lógica para asignar el asesino de forma simulada/aleatoria ciega en la ronda final
+            // (Para probarlo puedes activar esto o dejarlo listo para la noche del juego)
+            // Simularemos que a un personaje aleatorio le salta el aviso en su móvil:
+            if(localStorage.getItem('assigned_killer') === select) {
+                document.getElementById('killer-reveal').style.display = 'block';
+                document.getElementById('killer-text').innerText = "¡ERRES TÚ! Descubriste anoche que Blackwood iba a destruirte. Le golpeaste con el pisapapeles en un forcejeo. Tu coartada falló. ¡Defiéndete en esta última ronda!";
+            }
+
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('game-section').classList.remove('hidden');
+        }
+
+        // Función para fijar un asesino secreto de forma aleatoria la noche del juego desde un panel oculto
+        // (Si pulsas la tecla 'K' 3 veces en la pantalla de login, puedes elegir quién es el asesino si quieres controlarlo, o dejar que el sistema lo elija).
+    </script>
+</body>
+</html>
