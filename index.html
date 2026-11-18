@@ -13,8 +13,9 @@
         select, input { width: 100%; padding: 10px; margin-top: 10px; background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
         .hidden { display: none; }
         .card { background: #252525; padding: 15px; margin-top: 15px; border-left: 4px solid #c5a059; border-radius: 4px; }
-        .round-box { background: #2a2215; border: 1px dashed #c5a059; padding: 12px; margin-top: 15px; border-radius: 4px; }
-        .timer-info { text-align: center; font-size: 14px; color: #a0a0a0; margin-bottom: 15px; font-style: italic; }
+        .round-box { background: #2a2215; border: 1px dashed #c5a059; padding: 15px; margin-top: 15px; border-radius: 4px; }
+        .timer-info { text-align: center; font-size: 14px; color: #a0a0a0; margin-bottom: 10px; font-style: italic; }
+        .clock-display { font-size: 24px; font-weight: bold; color: #d4af37; text-align: center; margin: 10px 0; background: #151515; padding: 10px; border-radius: 4px; border: 1px solid #444; }
     </style>
 </head>
 <body>
@@ -47,18 +48,21 @@
             <h3 id="char-title" style="margin-bottom: 5px;"></h3>
             <p class="timer-info" id="char-subtitle"></p>
 
-            <!-- ESTADO ACTUAL DE LA HISTORIA ( GLOBAL ) -->
-            <div class="round-box">
-                <h4 style="margin-top:0; color:#c5a059;">📢 Estado de la Investigación (Global)</h4>
-                <p id="global-story">Selecciona una ronda para ver los acontecimientos de la noche.</p>
-            </div>
-
             <!-- CONTROLES DE RONDA -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px;">
-                <button onclick="setRound(1)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 1 (Min 0)</button>
-                <button onclick="setRound(2)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 2 (Min 20)</button>
-                <button onclick="setRound(3)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 3 (Min 40)</button>
-                <button onclick="setRound(4)" style="background:#501212; color:#fff; border:1px solid #ff4444;">Ronda 4 (Min 60)</button>
+                <button onclick="startRound(1)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 1</button>
+                <button onclick="startRound(2)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 2</button>
+                <button onclick="startRound(3)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 3</button>
+                <button onclick="startRound(4)" style="background:#501212; color:#fff; border:1px solid #ff4444;">Iniciar Ronda 4</button>
+            </div>
+
+            <!-- CRONÓMETRO DE LA RONDA -->
+            <div class="clock-display" id="timer-clock">20:00</div>
+
+            <!-- ESTADO ACTUAL DE LA HISTORIA ( GLOBAL - IGUAL PARA TODOS ) -->
+            <div class="round-box">
+                <h4 style="margin-top:0; color:#c5a059;">📢 Evolución de la Trama (Global)</h4>
+                <p id="global-story">Selecciona una ronda para iniciar el cronómetro y desvelar los acontecimientos.</p>
             </div>
 
             <!-- PERFIL PERSONAL -->
@@ -72,10 +76,10 @@
                 <p id="char-secreto"></p>
             </div>
 
-            <!-- INFORMACIÓN QUE SE DESVELA POR RONDAS EN TU PERFIL -->
-            <div class="card" style="border-left-color: #2e86c1;" id="round-intel-box">
-                <h4>🔍 Información Confidencial (Actualizada)</h4>
-                <p id="char-round-info">Selecciona una ronda arriba para consultar las pistas de tu personaje.</p>
+            <!-- INFORMACIÓN CONFIDENCIAL DE TU PERFIL (DIFERENTE PARA CADA UNO) -->
+            <div class="card" style="border-left-color: #2e86c1;">
+                <h4>🔍 Información Confidencial (Tu Perfil)</h4>
+                <p id="char-round-info">Selecciona una ronda para consultar tus pistas privadas.</p>
             </div>
 
             <div class="card" style="border-left-color: #2ecc71;">
@@ -115,7 +119,7 @@
                 frase: "'Hombre, ¿matar yo a Barnaby? ¡Si con lo mal que llevo la contabilidad, hacer cuentas va contra mi filosofía!'",
                 intel: {
                     1: "Alguien ha visto tu nombre en los extractos bancarios preliminares de la entrada del cabaret.",
-                    2: "Rumor de pasillo: Se comenta que alguien del grupo frecuentaba los astilleros abandonados de medianoche.",
+                    2: "Rumor de pasillo: Se comenta que alguien del grupo frecuentaba los astilleros abandonados a medianoche.",
                     3: "Descubres con horror que tu letra de inversor fue vista por Vera... y parece que sospecha de ti.",
                     4: "¡El cerco se estrecha! Alguien ha depositado un recibo de los astilleros manchado de sangre junto al cadáver."
                 }
@@ -238,6 +242,7 @@
         };
 
         let currentCharacterKey = "";
+        let timerInterval = null;
 
         function login() {
             const select = document.getElementById('char-select').value;
@@ -255,35 +260,55 @@
             document.getElementById('char-secreto').innerText = char.secreto;
             document.getElementById('char-frase').innerText = char.frase;
 
-            // Por defecto mostramos la Ronda 1 al entrar
-            setRound(1);
-
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('game-section').classList.remove('hidden');
         }
 
-        function setRound(roundNum) {
-            // Actualizar texto global de la historia
+        function startRound(roundNum) {
+            // Limpiar temporizador previo si existiera
+            if(timerInterval) clearInterval(timerInterval);
+
+            // Actualizar texto global idéntico para todos
             document.getElementById('global-story').innerHTML = globalStories[roundNum];
 
-            // Actualizar intel personal del personaje
+            // Actualizar pista confidencial del perfil personal
             const char = characters[currentCharacterKey];
             document.getElementById('char-round-info').innerText = char.intel[roundNum];
 
-            // Lógica del Asesino Secreto en la Ronda 4:
-            // El asesino predeterminado en este guion será "julian" (Julian El Sombra, el expolicía y matón que robó la caja fuerte).
+            // Lógica del Asesino Secreto en la Ronda 4 (El asesino es Julian)
             const killerReveal = document.getElementById('killer-reveal');
             const killerText = document.getElementById('killer-text');
 
             if (roundNum === 4 && currentCharacterKey === 'julian') {
                 killerReveal.style.display = 'block';
-                killerText.innerText = "¡ERRES TÚ! Descubriste anoche que Blackwood iba a echarte la culpa de todo el chanchullo de la comisaría. Entraste en su despacho, forcejeasteis y le golpeaste con el pisapapeles. Tu coartada falló. ¡Sobrevive a la acusación final y defiende tu pellejo!";
+                killerText.innerText = "¡ERES TÚ! Descubriste anoche que Blackwood iba a echarte la culpa de todo el chanchullo de la comisaría. Entraste en su despacho, forcejeasteis y le golpeaste con el pisapapeles. Tu coartada falló. ¡Sobrevive a la acusación final y defiende tu pellejo!";
             } else if (roundNum === 4) {
                 killerReveal.style.display = 'block';
                 killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> Revisa las pruebas, acusa a los demás, vigila las coartadas y descubre quién cometió el crimen para ganar la partida.";
             } else {
                 killerReveal.style.display = 'none';
             }
+
+            // Iniciar cuenta atrás de 20 minutos (1200 segundos)
+            let totalSeconds = 20 * 60;
+            const clockElement = document.getElementById('timer-clock');
+
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(totalSeconds / 60);
+                let seconds = totalSeconds % 60;
+                
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                
+                clockElement.innerText = minutes + ":" + seconds;
+
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    clockElement.innerText = "¡TIEMPO AGOTADO! Vota o avanza de ronda";
+                } else {
+                    totalSeconds--;
+                }
+            }, 1000);
         }
     </script>
 </body>
