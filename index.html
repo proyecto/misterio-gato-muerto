@@ -29,6 +29,16 @@
         .roster-card { background: #1d1b17; border: 1px solid #3d3420; padding: 14px; border-radius: 6px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; }
         .roster-card b { color: #d4af37; font-size: 15.5px; }
         .roster-prop { color: #e67e22; font-style: italic; display: block; margin-top: 6px; font-size: 14px; }
+
+        .intel-block { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
+        .intel-row { background: #1c1c1c; border-left: 3px solid #3498db; padding: 10px 12px; border-radius: 4px; font-size: 15px; line-height: 1.55; }
+        .intel-row.accuse { border-left-color: #e74c3c; background: #251818; }
+        .intel-row.material { border-left-color: #f39c12; background: #262115; }
+        .intel-row.danger { border-left-color: #9b59b6; background: #231728; }
+        .intel-tag { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .tag-accuse { color: #ff6b6b; }
+        .tag-material { color: #f1c40f; }
+        .tag-danger { color: #bb86fc; }
     </style>
 </head>
 <body>
@@ -253,10 +263,24 @@
                 secreto: "Eres inversor fantasma en la quiebra fraudulenta de los astilleros del puerto fluvial. Lord Blackwood financió tu tapadera y esta misma noche te exigió el 80% de los beneficios o entregaría tus pagarés al fiscal federal. Le gritaste que antes lo verías flotando en el Misisipi. Viste a Mateo merodeando el despacho con una toalla.", 
                 frase: "'¡Por todos los santos! ¿Matar yo a Barnaby? ¡Si con lo mal que llevo los números, cuadrar cuentas con la muerte va contra mi filosofía!'",
                 intel: {
-                    1: "Alguien vio tu nombre garabateado en un recibo bancario manchado sobre el mostrador del guardarropa.",
-                    2: "Viste a Mateo y a Dafne intercambiar una mirada gélida justo cuando las luces del salón parpadearon antes del crimen.",
-                    3: "Descubres horrorizado que tu letra bancaria fue interceptada por Vera, y parece dispuesta a venderte al mejor postor.",
-                    4: "¡El cerco se cierra! Un extracto bancario de los astilleros ha aparecido bajo el cuerpo ensangrentado de Blackwood."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste con tus propios ojos a <b>Mateo 'El Porteño'</b> merodear la puerta del despacho de Blackwood minutos antes del crimen. Iba con las mangas remangadas y un fuerte olor a tabaco de puro habano recién apagado.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Thiago</b> guardar a toda prisa botellas de coñac reservado y un sobre con billetes bajo el mostrador de espaldas a los clientes.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Alguien ha visto un recibo con el membrete de tus <i>Astilleros Valdés</i> tirado en la papelera del guardarropa. Si te preguntan, di que era una simple factura de madera.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>¡Descubres que <b>Vera</b> tiene en su bolso el pagaré original de tus astilleros! Te hace señas insinuando que si no la ayudas a tapar sus deudas de ruleta, enseñará el papel a todos.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Escuchas a <b>Axel</b> y a <b>Julian</b> discutir en voz baja sobre una llave inglesa pesada de taller que ha desaparecido y que tenía manchas sospechosas.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Ylva</b> (la auditora) te clava la mirada mientras anota en su libreta una cifra exacta: 50.000 dólares del desfalco de los astilleros.</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Encaras a <b>Mateo</b> delante de todos: sabes que la caja fuerte de Blackwood se abrió en el minuto del apagón y él fue el único que estuvo junto a la puerta trasera. ¡Pídele explicaciones sobre el dinero que lleva en los bolsillos!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Forma un bando con <b>Thiago</b> (es tu hombre de confianza en la sala). Thiago te asegura que Mateo le ofreció 100 dólares para que se hiciera el sordo.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>La policía exterior pide explicaciones por el fraude portuario. ¡Necesitas cerrar filas y dirigir todos los focos hacia el verdadero asesino!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Lidera la mesa con tu carisma y suelta tu frase obligatoria. Las piezas encajan: la ceniza de tabaco en la escena, la llave maestra robada y el botín de la caja fuerte señalan a <b>Mateo</b>. ¡Coordina los votos para desenmascararlo!</div>
+                    </div>`
                 }
             },
             vera: {
@@ -265,10 +289,24 @@
                 secreto: "Avalaste tus deudas de ruleta con las escrituras del piso de tu familia. Además, mantienes un romance clandestino y ardiente con Julian (el chófer señorial, marido de la implacable doctora Beatrice). Blackwood tenía tu carta de desahucio en su chaqueta y amenazaba con entregársela a Beatrice esta misma madrugada.", 
                 frase: "'¡La vida son dos días de charlestón! Si las trompetas de este antro no ahogaran los gritos, ya me habría arrojado al río!'",
                 intel: {
-                    1: "El bebé de Beatrice llora desconsolado en la planta de la nodriza, y notas que Julian mira la escalera con demasiada insistencia.",
-                    2: "Alguien ha interceptado una notita tuya perfumada con esencia de jazmín dirigida a Julian. ¡Si Beatrice la lee, te destruirá!",
-                    3: "Viste a Julian y a Axel secreteándose junto al Hispano-Suiza aparcado fuera minutos antes del apagón.",
-                    4: "Encuentran una horquilla idéntica a la tuya caída justo en el umbral del despacho de la víctima."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a tu amante secreto <b>Julian</b> y a <b>Axel</b> secreteándose junto al Hispano-Suiza en el callejón con herramientas y bultos en un doble fondo.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Oíste a <b>Damián</b> pegarle un grito furioso a Blackwood asegurando que <i>'antes lo vería flotando en el Misisipi'</i>.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Notas que la <b>Dra. Beatrice</b> mira a su marido Julian con sospecha... ¡y tú te diste cuenta de que perdiste una de tus horquillas de brillantes cerca del pasillo!</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Tienes en tu bolso el pagaré de los astilleros de <b>Damián</b> que Blackwood dejó caer al discutir. Puedes presionar a Damián para que sea tu aliado y te defienda.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Dafne</b> esconder un juego de alambres y ganzúas en su bolso limosnera justo cuando sonaba la trompeta de jazz.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>¡<b>Beatrice</b> ha interceptado una notita perfumada con tu esencia de jazmín! Como descubra que te acuestas con su marido Julian, te destrozará viva.</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Acusas a <b>Mateo</b>: le viste meterse un fajo de dinero y un reloj de bolsillo de Blackwood durante el tumulto a oscuras. ¡Ese porteño es un ladrón desalmado!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Te das cuenta de que el bolso que te vendió <b>Dafne</b> es una imitación perfecta; puedes usar ese secreto para obligar a Dafne a votar contigo.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Una horquilla de baile idéntica a las tuyas ha aparecido en el suelo del despacho del crimen. ¡Jura que se te cayó bailando el charlestón!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Suelta tu frase obligatoria con dramatismo. Haz frente común con Julian y Damián: Mateo es el único que tenía la combinación para robar la caja y huir. ¡Vótale sin vacilar!</div>
+                    </div>`
                 }
             },
             silvana: { 
@@ -277,10 +315,24 @@
                 secreto: "Eres la heredera secreta de una descomunal fortuna del caucho colonial; fingiste tu ruina para escapar de tu familia y coleccionas en secreto carísimos gramófonos dorados e instrumentos únicos traídos de Europa. Blackwood tenía en su caja fuerte el testamento original de tu padre y planeaba chantajearte con tu verdadera identidad.", 
                 frase: "'Yo solo soy una pobre pintora bohemia... ¡por la Virgen, si apenas tengo para aguarrás y carboncillos!'",
                 intel: {
-                    1: "Escuchas comentarios de Thiago sobre bonos de caucho extranjero; te aterra que descubra de dónde viene tu dinero.",
-                    2: "Ylva (la economista) ha estado revisando unas facturas de material de bellas artes de París que están a tu nombre.",
-                    3: "Alguien ha abierto el bolso de tus bocetos y ha visto un catálogo de antigüedades que vale miles de dólares.",
-                    4: "Descubres que la caja fuerte de Blackwood está forzada y que el testamento de tu padre ha desaparecido de su interior."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a la <b>Dra. Beatrice</b> esconder apresuradamente un frasco médico de cristal oscuro en el perchero cerca de la puerta del despacho.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Mateo</b> intentar forzar la cerradura del despacho con una ganzúa de alambre antes de que Blackwood entrara.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Dafne</b> no deja de mirarte con desconfianza: como experta en joyas, se ha fijado en que el broche de tu boina lleva un zafiro auténtico de miles de dólares.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Encaras a <b>Beatrice</b>: en la libreta negra de Blackwood hay recetas de morfina robada del sanatorio con su firma médica estampada. ¡Tenía motivos de sobra para silenciarlo!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Oíste a <b>Thiago</b> decirle a Mateo que la llave maestra de los reservados estaba colgada en el casillero número 4.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Ylva</b> (la auditora) te enseña una factura bancaria de París con tu nombre y compras de antigüedades de lujo. Tu fachada de pobre artista empieza a resquebrajarse.</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>¡Descubres que la caja fuerte de Blackwood fue reventada y que el testamento de tu padre ha desaparecido! Puedes ofrecer apoyo financiero a <b>Dafne</b> o a <b>Ylva</b> para que te ayuden a señalar a Mateo.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Julian</b> frotarse la manga de su camisa blanca intentando quitar una mancha oscura y rojiza.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Todos se preguntan cómo una pintora sin un centavo puede permitirse un ático inmenso en el French Quarter. ¡Defiende tu arte y tu bohemia!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Lanza tu frase obligatoria. Las pruebas materiales son rotundas: la cerilla de puro habano, la caja forzada y el dinero robado señalan a <b>Mateo</b>. ¡Vota para que no escape con tu testamento!</div>
+                    </div>`
                 }
             },
             mateo: { 
@@ -289,10 +341,24 @@
                 secreto: "El tabaco es solo una pantalla: robaste un cargamento entero de licor de contrabando y diamantes que pertenecía a Blackwood. Este te tendió una trampa y te citó en su despacho para que firmaras tu propia ruina o entregarte a la banda rival del puerto. Odias a Blackwood con toda tu alma.", 
                 frase: "'¡Che, viejo, pará la mano! ¿Yo asesino? ¡A mí el difunto me caía pesado, pero jamás le levantaría la mano a nadie!'",
                 intel: {
-                    1: "Notas un persistente olor a pólvora y alcohol destilado en las mangas de tu propia chaqueta.",
-                    2: "Dafne te hace una señal de clave bancaria desde la esquina: solo vosotros dos sabéis cómo se abre la puerta interior.",
-                    3: "Ves a Axel buscar con disimulo una llave pesada que ha desaparecido de su caja de herramientas.",
-                    4: "Aparece una caja de puros robada con las iniciales de Blackwood escondida bajo el sillón donde tú estabas sentado."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a <b>Damián</b> salir del pasillo del despacho con el rostro desencajado, la corbata deshecha y murmurando insultos contra Blackwood.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Axel</b> guardar una herramienta de hierro en el mono de trabajo tras discutir con Julian sobre una deuda.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Notas restos de ceniza de tu puro habano y una rozadura en el puño de tu camisa. <b>Dafne</b> te observa porque sabe que tú tenías la clave de la caja fuerte.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Ataca a <b>Thiago</b>: él es el jefe de sala, tenía la llave maestra y te vendió botellas de coñac robadas de la bodega de Blackwood. ¿Por qué nadie le investiga a él?</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Revela que viste a <b>Vera</b> y a <b>Julian</b> besándose apasionadamente en el callejón oscuro jurando que se librarían del chantaje de Blackwood.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Dafne</b> te exige en un susurro la mitad de las joyas de la caja o dirá a la policía que tú entraste al despacho. ¡Gana tiempo y engáñala!</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Siembra sospechas sobre <b>Axel y Julian</b>: su coche en el callejón oculta mercancía clandestina y la llave inglesa de Axel encaja con la cerradura destrozada.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Insinúa que la <b>Dra. Beatrice</b> envenenó a Blackwood con morfina antes de que alguien le golpeara.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Una colilla de cigarro habano y un encendedor de latón han aparecido cerca del charco de sangre. ¡Usa tu labia de tango, niega que sean tuyos y desvía la culpa a Damián o Axel!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Tu Estrategia Final:</span>¡Revisa el mensaje de alerta roja más abajo! Suelta tu frase obligatoria con máxima indignación, afirma que eres un simple comerciante víctima de una conspiración y vota a Axel o a Damián para salvar tu pellejo.</div>
+                    </div>`
                 }
             },
             dafne: {
@@ -301,10 +367,24 @@
                 secreto: "Tu devoción por el lujo y la moda te llevó al crimen: eres una ladrona y falsificadora de guante blanco. Aprovechando tu prestigio, das el cambiazo a bolsos de coleccionista y alhajas de los ricos por réplicas falsificadas casi perfectas. Lord Blackwood descubrió que las joyas de esmeraldas de su caja fuerte eran imitaciones colocadas por ti y te amenazaba con la cárcel si no le pagabas una fortuna esta noche.", 
                 frase: "'¡Por favor! Una dama con mi sentido del estilo y la moda jamás se rebajaría a mancharse las manos de sangre con un tosco pisapapeles.'",
                 intel: {
-                    1: "Llevas en tu bolso de fiesta un juego de ganzúas finas y un broche falso que casi coincide con el collar de perlas de Vera.",
-                    2: "Viste a Mateo esconder nerviosamente un fajo de billetes en la barra justo antes de apagarse las luces.",
-                    3: "Alguien intentó forzar el pestillo de tu bolso de mano mientras charlabas con Mateo en la mesa de juego.",
-                    4: "El joyero de caudales de Blackwood ha aparecido abierto en el suelo... ¡y las esmeraldas que contiene son tus falsificaciones!"
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a <b>Mateo</b> esconder nerviosamente un fajo de billetes en la barra justo cuando parpadearon las luces antes del crimen.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Examinaste con ojo clínico a <b>Silvana</b>: bajo su boina bohemia asoma un zafiro de Ceilán genuino de 10.000 dólares. ¡Esa chica no es pobre, es multimillonaria!</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Llevas ganzúas finas en tu bolso de fiesta; <b>Thiago</b> te vio merodear la puerta de servicio con ademán culpable.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Encaras a <b>Mateo</b> a solas: la caja fuerte de Blackwood está abierta y vacía. ¡Tú le diste la combinación y ese granuja se ha quedado todo el dinero sin compartirlo!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Descubres que el collar de perlas que luce <b>Vera</b> es una réplica falsa vendida por ti misma en el mercado negro.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Blackwood tenía un informe que prueba que las esmeraldas de su caja eran falsificaciones tuyas. ¡Si la policía abre el joyero, te culparán del robo!</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Únete al bando de <b>Silvana y Vera</b>: Mateo te ha traicionado y lleva en sus bolsillos el botín de la caja fuerte. ¡Es el momento de destaparlo ante todos!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Axel</b> manipular una tenaza manchada de lubricante oscuro junto a la chimenea.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Alguien intentó abrir el broche de tu bolso mientras tomabas una copa. ¡Protege tus ganzúas!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Utiliza tu frase obligatoria con porte aristocrático. Apunta sin piedad a <b>Mateo</b>: él fue el único que saqueó la caja y no supo contener su violencia contra Blackwood.</div>
+                    </div>`
                 }
             },
             axel: {
@@ -313,10 +393,24 @@
                 secreto: "Blindas los coches de los contrabandistas y eres socio en la sombra de Julian (el chófer de la alta sociedad), quien te trae los vehículos de los millonarios para saquear recambios caros y montar dobles fondos para armas. Blackwood amenazó con delatar todo vuestro garaje clandestino al sheriff esta noche.", 
                 frase: "'Un buen motor afinado no hace ruido de más; el difunto aceleró a fondo en una curva cerrada y reventó la biela.'",
                 intel: {
-                    1: "Revisaste los bajos del Hispano-Suiza que aparcó Julian en el callejón: hay restos de barro fresco del embarcadero.",
-                    2: "Escuchas una discusión brutal entre Beatrice y Blackwood sobre pagarés bancarios envenenados.",
-                    3: "Notas que falta una de tus llaves inglesas más pesadas, la misma que le prestaste a Julian antes de cenar.",
-                    4: "Una huella de grasa de motor mezclada con sangre fresca ha aparecido en el pomo de la puerta de Blackwood."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a <b>Thiago</b> manipular el cuadro de fusibles del sótano justo dos minutos antes del apagón en el que mataron a Blackwood.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Revisaste los bajos del Hispano-Suiza que aparcó <b>Julian</b>: hay barro fresco del muelle fluvial y cajas de contrabando ocultas.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Notas que falta una de tus llaves inglesas más pesadas (número 14); se la habías prestado a Julian o a Mateo antes de cenar.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Encaras a tu socio <b>Julian</b>: ¿por qué tu llave inglesa apareció cerca del despacho con restos de pintura dorada de la caja de Blackwood?</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Escuchaste a la <b>Dra. Beatrice</b> amenazar a Blackwood con una sobredosis médica si no retiraba sus pagarés.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Una huella de grasa negra de motor ha aparecido marcada en el picaporte del despacho de Blackwood. ¡Todos saben que tú tienes las manos manchadas de grasa!</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Acusas a <b>Mateo</b>: le vendiste un encendedor de latón naval grabado que ahora ha aparecido tirado cerca del charco de sangre. ¡Ese encendedor es suyo!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Cierra filas con <b>Julian</b>: jurad que estabais juntos en el callejón afinando el carburador del coche cuando sonó el golpe fatal.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>La policía rodea el coche del callejón; si descubren el doble fondo de armas, vosotros pagaréis el pato si no señaláis al asesino.</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Di tu frase obligatoria. Las pruebas mecánicas no mienten: el encendedor de latón y la ceniza de tabaco en la nuca de la víctima señalan a <b>Mateo Rossi</b>. ¡Vota con tu socio Julian!</div>
+                    </div>`
                 }
             },
             beatrice: {
@@ -325,10 +419,24 @@
                 secreto: "Falsificabas historiales psiquiátricos y sustraías morfina del sanatorio para revenderla a la red de Blackwood y asegurar el futuro económico de tu recién nacido. Blackwood amenazaba con publicar tu firma médica en la prensa si no le entregabas la mitad de tu consulta privada. Desconfías ciegamente de tu marido Julian.", 
                 frase: "'Como psiquiatra os aseguro que el único psicópata peligroso en esta habitación era el difunto Lord Blackwood.'",
                 intel: {
-                    1: "El llanto de tu bebé arriba te taladra los oídos; notas que Julian esquiva tu mirada cada vez que lo mencionan.",
-                    2: "Interceptas una mirada de complicidad y deseo prohibido entre tu marido Julian y Vera en mitad del salón.",
-                    3: "Alguien ha sustraído un frasco de éter de tu maletín médico dejado en el perchero de la entrada.",
-                    4: "Encuentras tu recetario médico firmado con una anotación de chantaje de puño y letra de Blackwood."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Como médico forense, examinas el cadáver: la víctima fue golpeada a traición mientras contaba dinero y tenía en la mano una cerilla quemada de puro habano (¡apunta a <b>Mateo</b>!).</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Notas que tu marido <b>Julian</b> huele a perfume dulzón de flor de jazmín... el mismo aroma que lleva <b>Vera</b>.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Tu maletín médico en el perchero ha sido revuelto y falta un frasco de morfina concentrada del sanatorio.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>¡Interceptas la carta perfumada con jazmín entre <b>Vera</b> y <b>Julian</b>! Encaras a ambos en público: su romance clandestino y sus deudas les daban el motivo perfecto para matar.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>En la libreta negra de Blackwood figura el nombre de <b>Silvana</b> con bonos de caucho colonial por valor de un millón de dólares; su pobreza es fingida.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Silvana</b> te acusa de traficar con narcóticos médicos para pagar las multas de tu marido. ¡Mantén la compostura fría!</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Diagnosticas la conducta de <b>Mateo</b>: sus pupilas dilatadas, su pulso desbocado y el temblor de sus manos corresponden al shock postraumático de un asesino violento.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Encontraste bajo las uñas de Blackwood hilos de tela arrancados de un chaleco idéntico al que viste Mateo.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Julian amenaza con delatar tus recetas fraudulentas si le acusas del crimen. ¡Pacta una tregua temporal con él para salvar a la familia!</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Haz valer tu autoridad científica y di tu frase obligatoria. La autopsia y las fibras bajo las uñas no dejan lugar a dudas: <b>Mateo 'El Porteño'</b> es el asesino.</div>
+                    </div>`
                 }
             },
             julian: {
@@ -337,10 +445,24 @@
                 secreto: "Trasportas mercancía prohibida en los coches señoriales y desvías piezas caras con Axel (el mecánico). Además, mantienes un idilio clandestino con Vera de la Vega, a quien prometiste fugarte esta noche. Blackwood os sorprendió besándoos en el callejón y os exigió 5.000 dólares bajo amenaza de muerte.", 
                 frase: "'En mi oficio de chófer aprendí la regla de oro: mirar por el retrovisor, callar y acelerar. Y yo esta noche solo he conducido.'",
                 intel: {
-                    1: "Aparcaste el Hispano-Suiza en la puerta trasera; Axel y tú sabéis perfectamente qué hay escondido en el doble fondo.",
-                    2: "Cruzas miradas ardientes con Vera mientras el resto discute; rezas para que tu mujer Beatrice no ate cabos.",
-                    3: "Viste la combinación de la caja fuerte de Blackwood escrita en un papel arrugado sobre la mesa del despacho.",
-                    4: "Alguien te vio salir del pasillo del despacho con una mancha roja en los puños... aunque juras que era grasa de freno."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Viste a <b>Damián</b> salir apresurado del despacho guardándose un documento bajo la solapa y mirando a ambos lados con pánico.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>En el Hispano-Suiza aparcado fuera hay cajas de licor que <b>Axel</b> y tú teníais que entregar a Mateo esta medianoche.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Llevas una mancha rojiza en el puño blanco de tu camisa de chófer; tu esposa Beatrice te está analizando con mirada gélida.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Desvía la atención hacia <b>Thiago</b>: él tenía la llave maestra del reservado y vio entrar a todos los sospechosos al pasillo privado.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>La carta perfumada de <b>Vera</b> ha caído en manos de Beatrice. Debes asegurar que Vera te acosaba o que solo era una carta de negocios.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Axel</b> te pide explicaciones por haber usado su llave inglesa sin avisarle. ¡Tranquilízale y mantén la alianza!</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Forma un bloque inquebrantable con <b>Axel</b>: jurad que estabais juntos en el motor del coche cuando ocurrió el crimen y que visteis a <b>Mateo</b> salir con paso ligero de la escena.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Dafne</b> discutir con Mateo detrás de la cortina roja exigiéndole su parte del dinero.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Beatrice amenaza con enviarte a prisión si no demuestras que la mancha de tu puño es grasa de motor y no sangre.</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Pronuncia tu frase obligatoria. Apoya la conclusión forense de Beatrice y el testimonio de Axel: <b>Mateo</b> cometió el crimen para adueñarse de las joyas y el dinero de Blackwood.</div>
+                    </div>`
                 }
             },
             ylva: {
@@ -349,10 +471,24 @@
                 secreto: "Descubriste un agujero financiero de 200.000 dólares: Blackwood usaba el cabaret para saquear fondos de inversores extranjeros y blanquear dinero de sobornos. Estabas a punto de congelar todas sus cuentas en Nueva York. Blackwood te encerró en el despacho antes de cenar amenazándote con un revólver si no firmabas la auditoría.", 
                 frase: "'¿Mande usted? Mi español no ser muy perfecto... ¿Quién es ese señor Barnaby? ¿Es un tipo de queso francés?'",
                 intel: {
-                    1: "Llevas en tu libreta el registro exacto de las deudas de Damián, Vera y Mateo: cualquiera de los tres tenía motivos para matarlo.",
-                    2: "Ves que Thiago se pone lívido cada vez que mencionas las transferencias bancarias de Río de Janeiro.",
-                    3: "Interceptas un memorando cifrado sobre las cuentas de Silvana: ¡descubres que es la heredera de una fortuna colosal!",
-                    4: "Dejas escapar una frase en perfecto castellano castizo cuando alguien grita que la policía corrupta viene de camino."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Tu libreta contable contiene los tres nombres con mayores deudas de usura con Blackwood: <b>Damián</b>, <b>Vera</b> y <b>Mateo</b>. Cualquiera de los tres se salvaba de la ruina con su muerte.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Descubriste un desfalco de 500 dólares en la caja del bar gestionada por <b>Thiago</b>.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Finges no entender bien el idioma y hablar con torpeza nórdica, pero todos sospechan que eres una espía de los bancos de Nueva York enviada para arruinarlos.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Destapas la bomba financiera: muestras una factura bancaria de París que demuestra que <b>Silvana</b> no es una pintora muerta de hambre, ¡sino una millonaria del caucho!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Tienes en tu poder una copia del pagaré del astillero fantasma de <b>Damián</b> por 50.000 dólares.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Blackwood te amenazó con un arma en su despacho antes de cenar para que firmaras la auditoría limpia; tienes restos de cera de lacre en las manos.</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Cuadras la contabilidad del robo: de la caja fuerte faltan exactamente 10.000 dólares en efectivo y un estuche de esmeraldas. ¡<b>Mateo</b> tiene los bolsillos abultados y no puede justificar de dónde han salido!</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Dafne y Mateo</b> discutir sobre cómo repartirse un sobre grueso antes del careo general.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Alguien insinúa que un auditor bancario en bancarrota es capaz de matar para cobrar la póliza de seguros del cabaret.</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Suelta tu frase obligatoria y muestra tus cálculos definitivos: Mateo tenía el móvil económico más urgente, la llave maestra robada y el dinero en su poder. ¡Vótale sin piedad!</div>
+                    </div>`
                 }
             },
             thiago: {
@@ -361,10 +497,24 @@
                 secreto: "Tu sueldo de jefe de sala es una miseria comparado con tu verdadero negocio: cobrabas sobornos a los clientes para no registrar sus visitas y robabas botellas de coñac francés de la bodega privada de Blackwood para revenderlas a Mateo. Esta misma noche, Blackwood descubrió que le faltaban 500 dólares de la recaudación de la caja del bar y amenazó con entregarte a la policía y dejarte en la calle.", 
                 frase: "'¡Por favor, señores, compostura! Mi único deber en este cabaret es que las copas estén llenas y el ambiente sea exquisito. ¡Yo solo soy el jefe de sala!'",
                 intel: {
-                    1: "Viste entrar a Blackwood a su despacho visiblemente alterado tras discutir con alguien en la barra.",
-                    2: "Sabes que la llave de la bodega y del reservado privado estuvo colgada en tu casillero hasta poco antes del apagón.",
-                    3: "Ves a Dafne y a Mateo merodeando cerca de la puerta trasera de servicio que tú sueles dejar entreabierta.",
-                    4: "Varios testigos te acusan de haber sido el último en entrar al despacho a llevarle una copa de oporto a Blackwood antes del crimen."
+                    1: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Fuiste el último en servir una copa de oporto a Blackwood y viste a <b>Mateo</b> discutiendo acaloradamente con él a puerta cerrada por un cargamento de tabaco.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Dafne</b> merodear la puerta de servicio con ganzúas finas asomando de su bolso de fiesta.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>La llave maestra de los reservados que cuelga en tu casillero del bar ha desaparecido; <b>Axel</b> te vio trastear en el cuadro eléctrico.</div>
+                    </div>`,
+                    2: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Revelas que <b>Mateo</b> te ofreció 100 dólares de propina en la barra para que 'te hicieras el sordo' durante el apagón.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Oíste gritos en el guardarropa entre <b>Damián y Vera</b> por unos documentos confidenciales de los astilleros.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span><b>Ylva</b> (la auditora) te acusa de haber robado 500 dólares de la caja registradora y vender botellas de la bodega privada.</div>
+                    </div>`,
+                    3: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Acusación Directa:</span>Te alias con <b>Damián</b>: el cabaret es vuestro terreno. Revelas que la llave maestra del casillero fue encontrada tirada junto al cenicero de <b>Mateo</b>.</div>
+                        <div class="intel-row material"><span class="intel-tag tag-material">📦 Prueba Material:</span>Viste a <b>Julian</b> cambiarse los guantes blancos en el pasillo oscuro con ademán culpable.</div>
+                        <div class="intel-row danger"><span class="intel-tag tag-danger">⚠️ Te salpica a ti:</span>Varios clientes dicen que te vieron correr por las escaleras hacia la cocina justo en el segundo exacto del golpe fatal.</div>
+                    </div>`,
+                    4: `<div class="intel-block">
+                        <div class="intel-row accuse"><span class="intel-tag tag-accuse">🎯 Votación Definitiva:</span>Pronuncia tu frase obligatoria. Apoya a Damián y a la Dra. Beatrice: la copa de oporto que le serviste a Blackwood estaba junto a la cerilla quemada de Mateo. ¡Vota por salvar El Gato Tuerto!</div>
+                    </div>`
                 }
             }
         };
@@ -570,7 +720,7 @@
                 document.getElementById('global-story').innerHTML = globalStories[activeRound] || "";
                 const char = characters[currentCharacterKey];
                 if (char && char.intel) {
-                    document.getElementById('char-round-info').innerText = char.intel[activeRound] || "";
+                    document.getElementById('char-round-info').innerHTML = char.intel[activeRound] || "";
                 }
 
                 // REVELACIÓN DEL ASESINO EN LA RONDA 4
