@@ -76,8 +76,8 @@
                     </div>
 
                     <div class="roster-card">
-                        <b>Dafne 'La Sirena' Mourlot (Nazaret):</b> Jefa administrativa de la firma de seguridad privada que custodia los caudales del cabaret. Voluptuosa, fría como el mármol y con un carácter imponente que hace temblar a los guardias. Lleva el brazo inmovilizado por un supuesto asalto, pero maneja las llaves de toda la ciudad.
-                        <span class="roster-prop">🧣 Atrezo distintivo: Pañuelo a modo de falso cabestrillo o gran brazalete metálico en el antebrazo.</span>
+                        <b>Dafne 'La Sirena' Mourlot (Nazaret):</b> Tasadora de alhajas y apasionada devota de la alta costura parisina. Fascinante, distinguida y de conversación exquisita, es la mujer más elegante del reservado. Asesora a la alta burguesía en compras de joyas exclusivas y bolsos de coleccionista, deslumbrando a todos con su porte aristocrático y su ojo clínico para el lujo.
+                        <span class="roster-prop">👛 Atrezo distintivo: Bolso de mano elegante (estilo clutch o limosnera de fiesta) o broche/joya brillante llamativa. Abrir y cerrar el broche de su bolso con un 'clic' indica que está calculando el valor de algo... o de alguien.</span>
                     </div>
 
                     <div class="roster-card">
@@ -86,7 +86,7 @@
                     </div>
 
                     <div class="roster-card">
-                        <b>Dra. Beatrice Sola (Tania):</b> Prestigiosa médica y psiquiatra del sanatorio de la ciudad. Analítica, observadora implacable, madre reciente y de una compostura gélida. Disecciona las mentes de los presentes con solo escucharles hablar un minuto.
+                        <b>Dra. Beatrice 'La Cirujana' Sola (Tania):</b> Prestigiosa médica y psiquiatra del sanatorio de la ciudad. Analítica, observadora implacable, madre reciente y de una compostura gélida. Disecciona las mentes de los presentes con solo escucharles hablar un minuto.
                         <span class="roster-prop">👓 Atrezo distintivo: Gafas de concha fina en la mano o pequeña libreta médica con pluma.</span>
                     </div>
 
@@ -119,7 +119,7 @@
                     <option value="mateo">Mateo 'El Porteño' Rossi</option>
                     <option value="dafne">Dafne 'La Sirena' Mourlot</option>
                     <option value="axel">Axel 'El Tuercas' Vane</option>
-                    <option value="beatrice">Dra. Beatrice Sola</option>
+                    <option value="beatrice">Dra. Beatrice 'La Cirujana' Sola</option>
                     <option value="julian">Julian 'El Sombra' Croft</option>
                     <option value="ylva">Ylva 'La Nórdica' Lindqvist</option>
                     <option value="thiago">Thiago 'El Carioca' Da Silva</option>
@@ -132,28 +132,31 @@
         <!-- PANTALLA 2: PERFIL DE JUEGO -->
         <div id="game-section" class="hidden">
 
+            <!-- ENCABEZADO DEL PERSONAJE -->
+            <h3 id="char-title" style="margin-bottom: 5px;"></h3>
+            <p class="timer-info" id="char-subtitle"></p>
 
             <!-- BLOQUE PREVIO AL ARRANQUE -->
             <div id="pre-game-box" class="card" style="border-left-color: #f39c12; background: #261f12;">
                 <h4 style="color: #f39c12;">🍸 Reservado Privado (Lectura de Personaje)</h4>
-                <p style="margin: 5px 0 10px 0; font-size: 14px;">
+                <p style="margin: 5px 0 10px 0; font-size: 14.5px;">
                     Lee atentamente tu ficha completa más abajo para meterte en tu papel y preparar tus argumentos. La investigación y el cronómetro de la <b>Ronda 1</b> comenzarán cuando el anfitrión dé la señal.
                 </p>
-                <div style="font-size: 14px; color: #e0e0e0;">
-                    👥 <b>Jugadores conectados en su perfil:</b> <span id="pregame-count" style="color:#2ecc71; font-weight:bold;">0</span> / 10
+                <div style="font-size: 14.5px; color: #e0e0e0;">
+                    👥 <b>Jugadores conectados en su perfil:</b> <span id="pregame-count" style="color:#2ecc71; font-weight:bold;">1</span> / 10
                 </div>
 
                 <!-- PANEL ESPECIAL PARA RAFAEL (DAMIÁN) -->
-                <div id="host-panel"
-                    style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #c5a059;">
-                    <p style="font-weight: bold; color: #d4af37; margin: 0 0 5px 0;">👑 Panel del Organizador (Rafael):
-                    </p>
+                <div id="host-panel" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #c5a059;">
+                    <p style="font-weight: bold; color: #d4af37; margin: 0 0 5px 0;">👑 Panel del Organizador (Rafael):</p>
                     <div id="host-player-list" class="player-grid"></div>
+                    
+                    <button id="btn-start-r1" onclick="triggerRound(1)" disabled style="margin-top: 15px;">
+                        ⏳ Esperando a que todos entren (1/10)
                     </button>
 
                     <div style="text-align: center; margin-top: 8px;">
-                        <a href="javascript:void(0)" onclick="triggerRound(1)"
-                            style="color:#888; font-size:12px; text-decoration:underline;">
+                        <a href="javascript:void(0)" onclick="triggerRound(1)" style="color:#888; font-size:12px; text-decoration:underline;">
                             Forzar inicio de Ronda 1 ahora (sin esperar a los 10)
                         </a>
                     </div>
@@ -165,18 +168,10 @@
                 <div id="host-round-controls" style="display:none; margin-top: 10px;">
                     <p class="timer-info" style="color:#c5a059; margin-bottom: 5px;">👑 Control de Rondas (Rafael):</p>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
-                        <button onclick="triggerRound(1)"
-                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
-                            1</button>
-                        <button onclick="triggerRound(2)"
-                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
-                            2</button>
-                        <button onclick="triggerRound(3)"
-                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
-                            3</button>
-                        <button onclick="triggerRound(4)"
-                            style="padding:8px 4px; font-size:13px; background:#501212; color:#fff; border:1px solid #ff4444;">Ronda
-                            4</button>
+                        <button onclick="triggerRound(1)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 1</button>
+                        <button onclick="triggerRound(2)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 2</button>
+                        <button onclick="triggerRound(3)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 3</button>
+                        <button onclick="triggerRound(4)" style="padding:8px 4px; font-size:13px; background:#501212; color:#fff; border:1px solid #ff4444;">Ronda 4</button>
                     </div>
                 </div>
 
@@ -184,6 +179,9 @@
 
                 <div class="round-box">
                     <h4 style="margin-top:0; color:#c5a059;">📢 Evolución de la Trama (Global)</h4>
+                    <p id="global-story"></p>
+                </div>
+
                 <div class="card" style="border-left-color: #2e86c1;">
                     <h4>🔍 Información Confidencial (Tu Pista Privada)</h4>
                     <p id="char-round-info"></p>
@@ -196,6 +194,10 @@
                 <p id="char-fachada"></p>
             </div>
 
+            <div class="card" style="border-left-color: #a93226;">
+                <h4>Tu Secreto Oscuro</h4>
+                <p id="char-secreto"></p>
+            </div>
 
             <div class="card" style="border-left-color: #2ecc71;">
                 <h4>Frase Clave Obligatoria</h4>
@@ -208,6 +210,16 @@
                 <p id="killer-text" style="font-weight: bold; color:#ffdddd;"></p>
             </div>
 
+            <!-- BOTONES FINALES -->
+            <div id="host-reset-area" style="display:none; margin-top:20px;">
+                <button onclick="resetGame()" style="background:#552222; color:#fff; font-size:13px; padding:8px;">
+                    ⚠️ Reiniciar Partida a 0 (Solo Organizador)
+                </button>
+            </div>
+
+            <button onclick="logout()" style="background: #333; color: #fff; margin-top: 20px;">
+                Cerrar Sesión / Salir
+            </button>
         </div>
     </div>
 
@@ -291,15 +303,15 @@
                 }
             },
             dafne: {
-                title: "Dafne 'La Sirena' Mourlot", subtitle: "La jefa de seguridad / Falsa lisiada",
-                fachada: "Directora de administración de la agencia de seguridad privada que vigila los locales nocturnos del distrito. De presencia arrebatadora, voz grave y temple de acero, lleva el brazo en cabestrillo por un supuesto tiroteo en los muelles. Es quien custodia los códigos, las llaves maestras y los cerrojos del cabaret.", 
-                secreto: "Tu lesión de brazo es una farsa total: una coartada perfecta para moverte sin sospechas. Eres una maestra abriendo cajas fuertes y estabas compinchada en desvalijar el depósito secreto de Blackwood mientras todos bailaban foxtrot en el salón. Viste a Mateo entrar al pasillo del despacho poco antes del grito.", 
-                frase: "'¡Mirad este cabestrillo! ¿Cómo demonios voy a levantar un pisapapeles de mármol para romperle la crisma a un hombre?'",
+                title: "Dafne 'La Sirena' Mourlot", subtitle: "La tasadora de alta costura / Falsificadora de joyas y bolsos",
+                fachada: "Dama de elegancia despampanante y presencia magnética, apasionada devota de la alta costura parisina, los vestidos de seda y el glamour del French Quarter. Es una tasadora reputada que asesora a la burguesía en compras de alhajas y bolsos exclusivos; nadie luce las perlas y los terciopelos con tanta distinción en el reservado.", 
+                secreto: "Tu devoción por el lujo y la moda te llevó al crimen: eres una ladrona y falsificadora de guante blanco. Aprovechando tu prestigio, das el cambiazo a bolsos de coleccionista y alhajas de los ricos por réplicas falsificadas casi perfectas. Lord Blackwood descubrió que las joyas de esmeraldas de su caja fuerte eran imitaciones colocadas por ti y te amenazaba con la cárcel si no le pagabas una fortuna esta noche.", 
+                frase: "'¡Por favor! Una dama con mi sentido del estilo y la moda jamás se rebajaría a mancharse las manos de sangre con un tosco pisapapeles.'",
                 intel: {
-                    1: "Sientes que el cabestrillo te delata: has movido los dedos con demasiada soltura delante de Beatrice.",
-                    2: "Sabes perfectamente que la cerradura del despacho privado de Blackwood fue engrasada esta misma tarde con grasa de coche.",
-                    3: "Alguien intentó forzar el pestillo de tu bolso mientras charlabas con Mateo en la barra.",
-                    4: "El joyero de caudales de Blackwood ha aparecido tirado cerca de ti, con signos de haber sido abierto con llave maestra."
+                    1: "Llevas en tu bolso de fiesta un juego de ganzúas finas y un broche falso que casi coincide con el collar de perlas de Vera.",
+                    2: "Viste a Mateo esconder nerviosamente un fajo de billetes en la barra justo antes de apagarse las luces.",
+                    3: "Alguien intentó forzar el pestillo de tu bolso de mano mientras charlabas con Mateo en la mesa de juego.",
+                    4: "El joyero de caudales de Blackwood ha aparecido abierto en el suelo... ¡y las esmeraldas que contiene son tus falsificaciones!"
                 }
             },
             axel: {
@@ -315,7 +327,7 @@
                 }
             },
             beatrice: {
-                title: "Dra. Beatrice Sola", subtitle: "La médica analítica / Dama del sanatorio",
+                title: "Dra. Beatrice 'La Cirujana' Sola", subtitle: "La médica analítica / Dama del sanatorio",
                 fachada: "Eminente psiquiatra y forense del sanatorio de Luisiana, madre reciente con una serenidad imperturbable que desarma a cualquiera. Viste con rigor científico, mira a los ojos con frialdad y analiza los gestos nerviosos de todos como si fueran especímenes de laboratorio.", 
                 secreto: "Falsificabas historiales psiquiátricos y sustraías morfina del sanatorio para revenderla a la red de Blackwood y asegurar el futuro económico de tu recién nacido. Blackwood amenazaba con publicar tu firma médica en la prensa si no le entregabas la mitad de tu consulta privada. Desconfías ciegamente de tu marido Julian.", 
                 frase: "'Como psiquiatra os aseguro que el único psicópata peligroso en esta habitación era el difunto Lord Blackwood.'",
@@ -368,15 +380,14 @@
             1: "<b>RONDA 1 - El Hallazgo del Cadáver (Minuto 0):</b> Lord Barnaby Blackwood yace con el cráneo destrozado junto a su escritorio privado en 'El Gato Tuerto'. El arma: su pesado pisapapeles de mármol de Carrara. La puerta fue abierta desde dentro y la caja fuerte presenta signos de haber sido manipulada con llave maestra. Arriba, el bebé de Beatrice berrea mientras las trompetas de Hot Jazz se han callado de golpe. ¡Nadie sale de este reservado! Comienza el careo.",
             2: "<b>RONDA 2 - La Libreta de Chantajes (Minuto 20):</b> Aparece la libreta negra de Blackwood sobre el piano. En sus páginas de piel hay pagarés asfixiantes, desfalcos bancarios, recetas de morfina y cartas de amor clandestinas de los presentes. La tensión explota: las miradas de odio y las acusaciones cruzadas se disparan en todas direcciones.",
             3: "<b>RONDA 3 - El Asedio Policial y las Pruebas (Minuto 40):</b> La policía de Nueva Orleans está al otro lado de la reja exterior y amenaza con tirar la puerta en 20 minutos. Han aparecido objetos personales de varios sospechosos revueltos en la escena del crimen, huellas de grasa y cerraduras forzadas. Las coartadas se derrumban. ¡Preparen sus acusaciones finales!",
-            4: "<b>RONDA 4 - Desenlace y Votación Final (Minuto 60):</b> ¡Ronda Final! El cerco se cierra. En este instante, <b>los dos asesinos compinchados</b> recibirán su mensaje secreto en su dispositivo. Es la hora de utilizar la frase clave obligatoria, defender la inocencia con uñas y dientes y votar a los dos culpables para ver quién sobrevive a la noche."
+            4: "<b>RONDA 4 - Desenlace y Votación Final (Minuto 60):</b> ¡Ronda Final! El cerco se cierra. En este instante, <b>el verdadero asesino</b> recibirá su mensaje secreto en su dispositivo. Es la hora de utilizar la frase clave obligatoria, defender la inocencia con uñas y dientes y votar al culpable definitivo para ver quién sobrevive a la noche."
         };
 
-        // IDENTIDADES DE LOS DOS ASESINOS COMPINCHADOS EN BASE64 PARA EVITAR AUTO-SPOILERS A RAFAEL
-        // (Al decodificarse en tiempo de ejecución, el sistema sabe quiénes son los 2 cómplices sin mostrar sus nombres en el código)
-        const CIPHER_CULPRITS = ["bWF0ZW8=", "ZGFmbmU="]; // Hash seguro anti-spoiler
+        // IDENTIDAD DEL ASESINO EN BASE64 PARA EVITAR AUTO-SPOILERS A RAFAEL
+        const CIPHER_CULPRIT = "bWF0ZW8="; // Hash seguro anti-spoiler
         function isCulprit(charKey) {
             try {
-                return CIPHER_CULPRITS.map(c => atob(c)).includes(charKey);
+                return atob(CIPHER_CULPRIT) === charKey;
             } catch (e) { return false; }
         }
 
@@ -393,6 +404,7 @@
             if (currentCharacterKey && characters[currentCharacterKey]) {
                 const savedPass = localStorage.getItem("gato_char_pass");
                 if (savedPass === passwords[currentCharacterKey]) {
+                    connectedPlayers.add(currentCharacterKey);
                     showGameProfile();
                     broadcastJoin(currentCharacterKey);
                 }
@@ -416,6 +428,7 @@
             localStorage.setItem("gato_char_key", select);
             localStorage.setItem("gato_char_pass", pass);
 
+            connectedPlayers.add(currentCharacterKey);
             showGameProfile();
             broadcastJoin(currentCharacterKey);
         }
@@ -553,17 +566,17 @@
                     document.getElementById('char-round-info').innerText = char.intel[activeRound];
                 }
 
-                // REVELACIÓN DE LOS DOS ASESINOS EN LA RONDA 4
+                // REVELACIÓN DEL ASESINO EN LA RONDA 4
                 const killerReveal = document.getElementById('killer-reveal');
 
                 if (activeRound === 4 && isCulprit(currentCharacterKey)) {
                     killerReveal.style.display = 'block';
-                    killerText.innerHTML = "⚠️ <b>¡TÚ ERES UNO DE LOS DOS ASESINOS COMPINCHADOS!</b><br><br>" +
-                        "Planificasteis el golpe al milímetro para libraros de las deudas y el chantaje de Blackwood: mientras uno abrió la puerta y forzó la cerradura de la caja fuerte usando la distracción de la música, el otro golpeó a Blackwood con el pisapapeles de mármol en pleno forcejeo. " +
-                        "¡Ahora debéis cubriros mutuamente las espaldas con disimulo, desviar sospechas hacia los demás y evitar que la mesa os descubra!";
+                    killerText.innerHTML = "⚠️ <b>¡TÚ ERES EL ASESINO DE LORD BLACKWOOD!</b><br><br>" +
+                        "No tuviste otra salida: Blackwood iba a arruinarte la vida esta misma madrugada y a entregarte a la policía. Entraste a su despacho aprovechando el estruendo del Hot Jazz, forcejeasteis y le golpeaste en la cabeza con el pesado pisapapeles de mármol. " +
+                        "¡Tu coartada se tambalea! Desvía sospechas hacia los demás, utiliza tu frase obligatoria y defiéndete con uñas y dientes para evitar que la mesa te vote culpable.";
                 } else if (activeRound === 4) {
                     killerReveal.style.display = 'block';
-                    killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> En esta mesa hay <b>DOS asesinos compinchados</b> que se están cubriendo mutuamente. Revisa las pistas, contrasta coartadas y desenmascara a la pareja criminal para ganar la partida.";
+                    killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> Entre vosotros hay <b>UN único culpable</b> que intenta camuflarse con coartadas falsas. Revisa las pistas, haz preguntas incómodas y votad al verdadero asesino para ganar la partida.";
                 } else {
                     killerReveal.style.display = 'none';
                 }

@@ -17,10 +17,10 @@ Juego de rol en vivo y misterio ambientado en los bajos fondos de Nueva Orleans 
 - **Nacho** - Mateo 'El Porteño' Rossi - `habano33`  
   *Atrezo:* Un puro habano (apagado) en los labios o en la solapa, y chaleco.
 - **Nazaret** - Dafne 'La Sirena' Mourlot - `seguro55`  
-  *Atrezo:* Pañuelo/fular a modo de falso cabestrillo o gran brazalete dorado.
+  *Atrezo:* Bolso de mano elegante (estilo clutch/limosnera de fiesta) o broche/joya brillante llamativa. *(Abrir y cerrar el broche de su bolso con un 'clic' indica que está calculando el valor de algo o alguien).*
 - **Juan** - Axel 'El Tuercas' Vane - `bujia99`  
   *Atrezo:* Tirantes de trabajo y un trapo de taller o llave pequeña asomando del bolsillo.
-- **Tania** - Dra. Beatrice Sola - `psiqui12`  
+- **Tania** - Dra. Beatrice 'La Cirujana' Sola - `psiqui12`  
   *Atrezo:* Gafas de lectura o libretita médica de notas con pluma.
 - **Javi** - Julian 'El Sombra' Croft - `soga77`  
   *Atrezo:* Guantes blancos de chófer de lujo o gorra de plato. *(Quitarse un guante es su señal de alerta).*
