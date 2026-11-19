@@ -39,6 +39,12 @@
         .tag-accuse { color: #ff6b6b; }
         .tag-material { color: #f1c40f; }
         .tag-danger { color: #bb86fc; }
+
+        .vote-option-card { display: flex; align-items: center; gap: 8px; background: #19141f; border: 1px solid #4a3b56; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 13.5px; transition: all 0.2s; }
+        .vote-option-card:hover { border-color: #9b59b6; background: #251d2f; }
+        .vote-option-card input { width: auto; margin: 0; cursor: pointer; }
+        .badge-voted { background: #8e44ad !important; color: #fff !important; font-size: 11px; }
+        .badge-pending { background: #d35400 !important; color: #fff !important; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -186,7 +192,24 @@
                         <summary style="cursor: pointer; font-weight: bold; color: #2ecc71; font-size: 13.5px; user-select: none;">
                             👥 Jugadores conectados en directo: <span id="active-host-count">1</span> / 10 (clic para ocultar/ver)
                         </summary>
+                        
+                        <div id="host-voting-status" style="margin-top: 10px; padding: 8px 10px; background: #24162e; border: 1px solid #8e44ad; border-radius: 4px; font-size: 13px;">
+                            🗳️ <b>Votos Ronda <span id="host-voting-round-num">1</span>:</b> <span id="host-voted-count" style="font-weight:bold; color:#bb86fc;">0</span> / <span id="host-total-voters">10</span> votos emitidos
+                            <div id="all-voted-alert" style="display:none; margin-top: 8px; color: #2ecc71; font-weight: bold;">
+                                🎉 ¡Todos los jugadores han votado en esta ronda!
+                                <button id="btn-next-round" onclick="advanceNextRound()" style="margin-top: 6px; padding: 8px; background: #27ae60; color: #fff; font-size: 13px; font-weight: bold;">
+                                    ⏩ Avanzar a Ronda Siguiente
+                                </button>
+                            </div>
+                        </div>
+
                         <div id="host-player-list-active" class="player-grid" style="margin-top: 10px;"></div>
+
+                        <!-- RECUENTO FINAL DE VOTACIÓN (SOLO EN RONDA 4) -->
+                        <div id="final-tally-box" style="display:none; margin-top: 12px; padding: 10px; background: #2d1515; border: 1px solid #e74c3c; border-radius: 4px;">
+                            <p style="margin: 0 0 6px 0; font-weight: bold; color: #ff6b6b;">⚖️ Veredicto Final de la Mesa (Quién votó a quién):</p>
+                            <div id="final-tally-list" style="font-size: 13px; line-height: 1.6;"></div>
+                        </div>
                     </details>
                 </div>
 
@@ -223,6 +246,25 @@
             <div class="card" id="killer-reveal" style="border-left-color: #ff0000; display:none; background:#2a1212;">
                 <h4 style="color:#ff4444;">⚠️ MENSAJE ULTIMATUM (SOLO PARA TI)</h4>
                 <p id="killer-text" style="font-weight: bold; color:#ffdddd;"></p>
+            </div>
+
+            
+            <!-- SECCIÓN DE VOTACIÓN Y SOSPECHA POR RONDA -->
+            <div id="voting-box" class="card" style="border-left-color: #9b59b6; background: #201a24; display: none;">
+                <h4 style="color: #bb86fc; margin-top:0;">🗳️ Tu Veredicto de la <span id="voting-round-title">Ronda 1</span></h4>
+                <p style="font-size: 14.5px; margin: 5px 0 12px 0;">
+                    Tras escuchar los argumentos, coartadas y acusaciones de este turno: <b>¿Quién crees en este momento que es el asesino de Lord Blackwood?</b>
+                </p>
+
+                <div id="voting-options-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;"></div>
+
+                <button id="btn-submit-vote" onclick="submitVote()" style="background: #9b59b6; color: #fff; margin-top: 5px;">
+                    🗳️ Confirmar mi sospechoso para esta ronda
+                </button>
+
+                <div id="vote-confirmed-msg" style="display:none; margin-top: 10px; padding: 10px; background: #132819; border: 1px solid #27ae60; border-radius: 4px; font-size: 14px; color: #2ecc71;">
+                    ✅ <b>Voto registrado:</b> Has señalado a <span id="voted-char-name" style="font-weight:bold; text-decoration:underline;"></span>. Puedes cambiar tu elección en cualquier momento antes de que el anfitrión avance de ronda.
+                </div>
             </div>
 
             <!-- BOTONES FINALES -->
@@ -550,6 +592,11 @@
         let activeRound = parseInt(localStorage.getItem("gato_active_round") || "0", 10);
         let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
         let isSyncing = false;
+        let currentVotes = {};
+        try {
+            const rawVotes = localStorage.getItem("gato_votes_data");
+            if (rawVotes) currentVotes = JSON.parse(rawVotes);
+        } catch (e) { currentVotes = {}; }
 
         window.addEventListener("DOMContentLoaded", () => {
             setInterval(updateClock, 1000);
@@ -623,7 +670,8 @@
                     data: {
                         connected: Array.from(connectedPlayers),
                         round: activeRound,
-                        startTime: roundStartTimestamp
+                        startTime: roundStartTimestamp,
+                        votes: currentVotes
                     }
                 };
                 await fetch(API_URL, {
@@ -651,6 +699,23 @@
                     if (Array.isArray(sData.connected)) {
                         sData.connected.forEach(c => connectedPlayers.add(c));
                     }
+                    connectedPlayers.add(currentCharacterKey);
+
+                    // Sincronizar votos de todas las rondas
+                    if (sData.votes && typeof sData.votes === 'object') {
+                        Object.keys(sData.votes).forEach(r => {
+                            if (!currentVotes[r]) currentVotes[r] = {};
+                            Object.assign(currentVotes[r], sData.votes[r]);
+                        });
+                    }
+                    if (activeRound >= 1) {
+                        const myStoredVote = localStorage.getItem("gato_vote_r" + activeRound);
+                        if (myStoredVote) {
+                            if (!currentVotes[activeRound]) currentVotes[activeRound] = {};
+                            currentVotes[activeRound][currentCharacterKey] = myStoredVote;
+                        }
+                    }
+                    localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
                     connectedPlayers.add(currentCharacterKey);
 
                     const isHost = (currentCharacterKey === 'damian');
@@ -701,19 +766,30 @@
             }
             applyStateUI();
             renderHostLobby();
+            renderVotingBox();
             await saveServerState();
+        }
+
+        function advanceNextRound() {
+            if (activeRound < 4) {
+                triggerRound(activeRound + 1);
+            }
         }
 
         async function resetGame() {
             if (!confirm("¿Seguro que quieres reiniciar la partida a 0 (Sala de Espera)?")) return;
             activeRound = 0;
             roundStartTimestamp = null;
+            currentVotes = {};
             localStorage.removeItem("gato_active_round");
             localStorage.removeItem("gato_round_start");
+            localStorage.removeItem("gato_votes_data");
+            for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
             connectedPlayers.clear();
             connectedPlayers.add(currentCharacterKey);
             applyStateUI();
             renderHostLobby();
+            renderVotingBox();
             await saveServerState();
         }
 
@@ -759,6 +835,7 @@
 
                 updateClock();
             }
+            renderVotingBox();
         }
 
         function renderHostLobby() {
@@ -780,6 +857,56 @@
                 }
             }
 
+            // Monitor de votos en el panel del organizador
+            const roundVotes = (activeRound >= 1 && currentVotes[activeRound]) ? currentVotes[activeRound] : {};
+            const votedCharKeys = Object.keys(roundVotes);
+            const votedCount = votedCharKeys.length;
+
+            const hostVotingRoundNum = document.getElementById('host-voting-round-num');
+            if (hostVotingRoundNum) hostVotingRoundNum.innerText = activeRound;
+
+            const hostVotedCount = document.getElementById('host-voted-count');
+            if (hostVotedCount) hostVotedCount.innerText = votedCount;
+
+            const hostTotalVoters = document.getElementById('host-total-voters');
+            if (hostTotalVoters) hostTotalVoters.innerText = Object.keys(characters).length;
+
+            const allVotedAlert = document.getElementById('all-voted-alert');
+            if (allVotedAlert) {
+                if (activeRound >= 1 && activeRound < 4 && votedCount >= 10) {
+                    allVotedAlert.style.display = 'block';
+                } else {
+                    allVotedAlert.style.display = 'none';
+                }
+            }
+
+            // Recuento en Ronda 4 (Final)
+            const finalTallyBox = document.getElementById('final-tally-box');
+            const finalTallyList = document.getElementById('final-tally-list');
+            if (finalTallyBox && finalTallyList) {
+                if (activeRound === 4 && votedCount > 0) {
+                    finalTallyBox.style.display = 'block';
+                    const tally = {};
+                    Object.values(roundVotes).forEach(suspectKey => {
+                        tally[suspectKey] = (tally[suspectKey] || 0) + 1;
+                    });
+                    const sorted = Object.entries(tally).sort((a,b) => b[1] - a[1]);
+                    let tallyHtml = "<div style='display:flex; flex-direction:column; gap:6px;'>";
+                    sorted.forEach(([suspectKey, numVotes]) => {
+                        const name = playerNames[suspectKey] || suspectKey;
+                        const charTitle = characters[suspectKey] ? characters[suspectKey].title : suspectKey;
+                        tallyHtml += `<div style='display:flex; justify-content:space-between; align-items:center; background:#1c0e0e; padding:6px 10px; border-radius:4px;'>
+                            <span>👉 <b>${charTitle}</b> (${name})</span>
+                            <span style='color:#f1c40f; font-weight:bold;'>${numVotes} ${numVotes === 1 ? 'voto' : 'votos'}</span>
+                        </div>`;
+                    });
+                    tallyHtml += "</div>";
+                    finalTallyList.innerHTML = tallyHtml;
+                } else {
+                    finalTallyBox.style.display = 'none';
+                }
+            }
+
             const listEl = document.getElementById('host-player-list');
             const activeListEl = document.getElementById('host-player-list-active');
 
@@ -791,17 +918,122 @@
                 Object.keys(characters).forEach(key => {
                     const real = playerNames[key];
                     const isConn = connectedPlayers.has(key);
+                    const hasVoted = Boolean(roundVotes[key]);
+                    const votedFor = hasVoted ? roundVotes[key] : null;
 
                     const div = document.createElement("div");
                     div.className = "player-item";
-                    if (isConn) {
-                        div.innerHTML = `<span><b>${real}</b></span><span class="badge badge-success">Listo</span>`;
-                    } else {
-                        div.innerHTML = `<span style="color:#888;">${real}</span><span class="badge badge-waiting">Falta</span>`;
+                    div.style.flexDirection = "column";
+                    div.style.alignItems = "stretch";
+                    div.style.gap = "4px";
+
+                    let voteBadgeHtml = "";
+                    if (activeRound >= 1) {
+                        if (hasVoted) {
+                            const votedName = playerNames[votedFor] || votedFor;
+                            voteBadgeHtml = `<span class="badge badge-voted" title="Votó por ${votedName}">🗳️ Votó</span>`;
+                        } else {
+                            voteBadgeHtml = `<span class="badge badge-pending">⏳ Falta voto</span>`;
+                        }
                     }
+
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span><b>${real}</b></span>
+                            <span class="badge ${isConn ? 'badge-success' : 'badge-waiting'}">${isConn ? 'Listo' : 'Falta'}</span>
+                        </div>
+                        ${voteBadgeHtml ? `<div style="display:flex; justify-content:flex-end;">${voteBadgeHtml}</div>` : ''}
+                    `;
                     container.appendChild(div);
                 });
             });
+        }
+
+        function renderVotingBox() {
+            const votingBox = document.getElementById('voting-box');
+            if (!votingBox) return;
+
+            if (activeRound === 0) {
+                votingBox.style.display = 'none';
+                return;
+            }
+
+            votingBox.style.display = 'block';
+            document.getElementById('voting-round-title').innerText = "Ronda " + activeRound;
+
+            const listContainer = document.getElementById('voting-options-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = "";
+
+            const roundVotes = (currentVotes[activeRound]) ? currentVotes[activeRound] : {};
+            const myVote = roundVotes[currentCharacterKey] || localStorage.getItem("gato_vote_r" + activeRound) || "";
+
+            Object.keys(characters).forEach(key => {
+                if (key === currentCharacterKey) return; // Un jugador no se vota a sí mismo
+
+                const char = characters[key];
+                const real = playerNames[key];
+                const isSelected = (myVote === key);
+
+                const label = document.createElement('label');
+                label.className = 'vote-option-card';
+                if (isSelected) {
+                    label.style.borderColor = '#9b59b6';
+                    label.style.background = '#281c34';
+                }
+
+                label.innerHTML = `
+                    <input type="radio" name="suspect-choice" value="${key}" ${isSelected ? 'checked' : ''} onchange="onSelectSuspect()">
+                    <div>
+                        <b style="color: ${isSelected ? '#e0b0ff' : '#e0e0e0'}">${char.title}</b>
+                        <span style="font-size:12px; color:#aaa; display:block;">(${real})</span>
+                    </div>
+                `;
+                listContainer.appendChild(label);
+            });
+
+            const confirmMsg = document.getElementById('vote-confirmed-msg');
+            const votedCharName = document.getElementById('voted-char-name');
+            const submitBtn = document.getElementById('btn-submit-vote');
+
+            if (myVote && characters[myVote]) {
+                if (confirmMsg) confirmMsg.style.display = 'block';
+                if (votedCharName) votedCharName.innerText = `${characters[myVote].title} (${playerNames[myVote]})`;
+                if (submitBtn) submitBtn.innerText = `🔄 Cambiar mi sospechoso para la Ronda ${activeRound}`;
+            } else {
+                if (confirmMsg) confirmMsg.style.display = 'none';
+                if (submitBtn) submitBtn.innerText = `🗳️ Confirmar mi sospechoso para la Ronda ${activeRound}`;
+            }
+        }
+
+        function onSelectSuspect() {
+            document.querySelectorAll('.vote-option-card').forEach(card => {
+                const radio = card.querySelector('input');
+                if (radio && radio.checked) {
+                    card.style.borderColor = '#9b59b6';
+                    card.style.background = '#281c34';
+                } else {
+                    card.style.borderColor = '#4a3b56';
+                    card.style.background = '#19141f';
+                }
+            });
+        }
+
+        function submitVote() {
+            const selected = document.querySelector('input[name="suspect-choice"]:checked');
+            if (!selected) {
+                alert("Por favor, selecciona a uno de los sospechosos de la lista antes de confirmar tu voto.");
+                return;
+            }
+            const suspectKey = selected.value;
+            if (!currentVotes[activeRound]) currentVotes[activeRound] = {};
+            currentVotes[activeRound][currentCharacterKey] = suspectKey;
+            localStorage.setItem("gato_vote_r" + activeRound, suspectKey);
+            localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
+
+            renderVotingBox();
+            renderHostLobby();
+            saveServerState();
         }
 
         function updateClock() {
