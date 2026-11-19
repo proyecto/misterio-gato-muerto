@@ -173,12 +173,21 @@
             <div id="active-game-box" class="hidden">
                 <div id="host-round-controls" style="display:none; margin-top: 10px;">
                     <p class="timer-info" style="color:#c5a059; margin-bottom: 5px;">👑 Control de Rondas (Rafael):</p>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
-                        <button onclick="triggerRound(1)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 1</button>
-                        <button onclick="triggerRound(2)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 2</button>
-                        <button onclick="triggerRound(3)" style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 3</button>
-                        <button onclick="triggerRound(4)" style="padding:8px 4px; font-size:13px; background:#501212; color:#fff; border:1px solid #ff4444;">Ronda 4</button>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+                        <button onclick="triggerRound(0)" style="padding:8px 2px; font-size:12px; background:#443322; color:#f39c12; border:1px solid #f39c12;">⏸️ Espera</button>
+                        <button onclick="triggerRound(1)" style="padding:8px 2px; font-size:12px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 1</button>
+                        <button onclick="triggerRound(2)" style="padding:8px 2px; font-size:12px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 2</button>
+                        <button onclick="triggerRound(3)" style="padding:8px 2px; font-size:12px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 3</button>
+                        <button onclick="triggerRound(4)" style="padding:8px 2px; font-size:12px; background:#501212; color:#fff; border:1px solid #ff4444;">Ronda 4</button>
                     </div>
+
+                    <!-- MONITOR DE JUGADORES EN VIVO PARA RAFAEL (DURANTE LA PARTIDA) -->
+                    <details open style="margin-top: 12px; background: #1a1a1a; padding: 10px 12px; border-radius: 4px; border: 1px solid #555;">
+                        <summary style="cursor: pointer; font-weight: bold; color: #2ecc71; font-size: 13.5px; user-select: none;">
+                            👥 Jugadores conectados en directo: <span id="active-host-count">1</span> / 10 (clic para ocultar/ver)
+                        </summary>
+                        <div id="host-player-list-active" class="player-grid" style="margin-top: 10px;"></div>
+                    </details>
                 </div>
 
                 <div class="clock-display" id="timer-clock">20:00</div>
@@ -683,10 +692,15 @@
 
         async function triggerRound(roundNum) {
             activeRound = roundNum;
-            roundStartTimestamp = Date.now();
+            roundStartTimestamp = (roundNum === 0) ? null : Date.now();
             localStorage.setItem("gato_active_round", activeRound);
-            localStorage.setItem("gato_round_start", roundStartTimestamp);
+            if (roundStartTimestamp) {
+                localStorage.setItem("gato_round_start", roundStartTimestamp);
+            } else {
+                localStorage.removeItem("gato_round_start");
+            }
             applyStateUI();
+            renderHostLobby();
             await saveServerState();
         }
 
@@ -752,6 +766,9 @@
             const pregameCountEl = document.getElementById('pregame-count');
             if (pregameCountEl) pregameCountEl.innerText = count;
 
+            const activeHostCountEl = document.getElementById('active-host-count');
+            if (activeHostCountEl) activeHostCountEl.innerText = count;
+
             const btn = document.getElementById('btn-start-r1');
             if (btn) {
                 btn.disabled = false;
@@ -764,21 +781,26 @@
             }
 
             const listEl = document.getElementById('host-player-list');
-            if (!listEl) return;
-            listEl.innerHTML = "";
+            const activeListEl = document.getElementById('host-player-list-active');
 
-            Object.keys(characters).forEach(key => {
-                const real = playerNames[key];
-                const isConn = connectedPlayers.has(key);
+            const targets = [listEl, activeListEl].filter(Boolean);
+            if (targets.length === 0) return;
 
-                const div = document.createElement("div");
-                div.className = "player-item";
-                if (isConn) {
-                    div.innerHTML = `<span><b>${real}</b></span><span class="badge badge-success">Listo</span>`;
-                } else {
-                    div.innerHTML = `<span style="color:#888;">${real}</span><span class="badge badge-waiting">Falta</span>`;
-                }
-                listEl.appendChild(div);
+            targets.forEach(container => {
+                container.innerHTML = "";
+                Object.keys(characters).forEach(key => {
+                    const real = playerNames[key];
+                    const isConn = connectedPlayers.has(key);
+
+                    const div = document.createElement("div");
+                    div.className = "player-item";
+                    if (isConn) {
+                        div.innerHTML = `<span><b>${real}</b></span><span class="badge badge-success">Listo</span>`;
+                    } else {
+                        div.innerHTML = `<span style="color:#888;">${real}</span><span class="badge badge-waiting">Falta</span>`;
+                    }
+                    container.appendChild(div);
+                });
             });
         }
 
