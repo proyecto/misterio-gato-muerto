@@ -1,103 +1,233 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cabaret El Gato Tuerto - Misterio</title>
+    <title>Cabaret El Gato Tuerto - Nueva Orleans 1923</title>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Georgia', serif; margin: 0; padding: 15px; }
-        .container { max-width: 650px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #c5a059; }
-        h1, h2, h3 { color: #c5a059; text-align: center; }
-        button { background: #c5a059; color: #121212; border: none; padding: 12px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; font-size: 16px; }
+        body { background-color: #121212; color: #e0e0e0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; margin: 0; padding: 15px; line-height: 1.5; }
+        .container { max-width: 680px; margin: 0 auto; background: #1e1e1e; padding: 22px; border-radius: 8px; border: 1px solid #c5a059; }
+        h1, h2, h3, h4 { color: #c5a059; text-align: center; }
+        button { background: #c5a059; color: #121212; border: none; padding: 12px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 10px; font-size: 16px; transition: all 0.2s; }
         button:hover { background: #d4af37; }
-        select, input { width: 100%; padding: 10px; margin-top: 10px; background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; }
-        .hidden { display: none; }
-        .card { background: #252525; padding: 15px; margin-top: 15px; border-left: 4px solid #c5a059; border-radius: 4px; }
-        .round-box { background: #2a2215; border: 1px dashed #c5a059; padding: 15px; margin-top: 15px; border-radius: 4px; }
-        .timer-info { text-align: center; font-size: 14px; color: #a0a0a0; margin-bottom: 10px; font-style: italic; }
-        .clock-display { font-size: 24px; font-weight: bold; color: #d4af37; text-align: center; margin: 10px 0; background: #151515; padding: 10px; border-radius: 4px; border: 1px solid #444; }
+        button:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed !important; border: 1px solid #555 !important; }
+        select, input { width: 100%; padding: 10px; margin-top: 10px; background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+        .hidden { display: none !important; }
+        .card { background: #252525; padding: 16px; margin-top: 15px; border-left: 4px solid #c5a059; border-radius: 4px; line-height: 1.6; font-size: 15.5px; }
+        .card h4 { text-align: left; margin-top: 0; }
+        .round-box { background: #2a2215; border: 1px dashed #c5a059; padding: 16px; margin-top: 15px; border-radius: 4px; line-height: 1.6; font-size: 15.5px; }
+        .timer-info { text-align: center; font-size: 14.5px; color: #a0a0a0; margin-bottom: 10px; font-style: italic; }
+        .clock-display { font-size: 28px; font-weight: bold; color: #d4af37; text-align: center; margin: 10px 0; background: #151515; padding: 10px; border-radius: 4px; border: 1px solid #444; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-success { background: #27ae60; color: #fff; }
+        .badge-waiting { background: #7f8c8d; color: #fff; }
+        .player-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 10px; font-size: 13.5px; }
+        .player-item { padding: 6px 10px; background: #1a1a1a; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .btn-enabled { background: #27ae60 !important; color: #fff !important; box-shadow: 0 0 10px rgba(39, 174, 96, 0.6); }
+        .intro-box { background: #171511; border: 1px solid #5a4723; padding: 18px; border-radius: 6px; margin: 15px 0; font-size: 15.5px; line-height: 1.65; }
+        .roster-card { background: #1d1b17; border: 1px solid #3d3420; padding: 14px; border-radius: 6px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; }
+        .roster-card b { color: #d4af37; font-size: 15.5px; }
+        .roster-prop { color: #e67e22; font-style: italic; display: block; margin-top: 6px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Cabaret El Gato Tuerto</h1>
         <h2>Sangre, Foxtrot y Lágrimas</h2>
-        
-        <!-- PANTALLA DE LOGIN -->
+
+        <!-- PANTALLA 1: AMBIENTACIÓN Y LOGIN -->
         <div id="login-section">
-            <p class="timer-info">Introduce tus datos de acceso facilitados por el mayordomo:</p>
-            <select id="char-select">
-                <option value="">-- Selecciona tu personaje --</option>
-                <option value="damian">Damián 'El Santo' Valdés (Clave: toreo20)</option>
-                <option value="vera">Vera de la Vega (Clave: foxtrot1)</option>
-                <option value="silvana">Silvana 'La Muda' Gaultier (Clave: caucho88)</option>
-                <option value="mateo">Mateo 'El Porteño' Rossi (Clave: habano33)</option>
-                <option value="dafne">Dafne 'La Sirena' Mourlot (Clave: seguro55)</option>
-                <option value="axel">Axel 'El Tuercas' Vane (Clave: bujia99)</option>
-                <option value="beatrice">Dra. Beatrice Sola (Clave: psiqui12)</option>
-                <option value="julian">Julian 'El Sombra' Croft (Clave: soga77)</option>
-                <option value="ylva">Ylva 'La Nórdica' Lindqvist (Clave: queso00)</option>
-                <option value="thiago">Thiago 'El Carioca' Da Silva (Clave: rioja44)</option>
-            </select>
-            <input type="password" id="char-pass" placeholder="Introduce tu contraseña secreta">
-            <button onclick="login()">Entrar al Reservado</button>
+            
+            <!-- PRÓLOGO HISTÓRICO / ATMÓSFERA 1923 -->
+            <div class="intro-box">
+                <p style="margin-top:0;">
+                    <b>Nueva Orleans, otoño de 1923.</b> La Ley Seca ahoga a la nación en una hipocresía dorada. Mientras la rancia aristocracia acude vestida de terciopelo y diamantes al Teatro Francés a escuchar <i>Aida</i>, en los callejones del French Quarter y en las riberas del Misisipi ruge la verdadera vida nocturna: el <b>Hot Jazz prohibido</b>, las trompetas salvajes que la moral puritana tilda de diabólicas, el humo de tabaco de contrabando y las destilerías clandestinas.
+                </p>
+                <p style="margin-bottom:0;">
+                    En el corazón de este laberinto brilla <b>El Gato Tuerto</b>, el cabaret clandestino más selecto y peligroso de la ciudad. Tras una puerta blindada con mirilla de latón, banqueros, contrabandistas, damas rebeldes y mecánicos de bólidos brindan con ginebra de bañera. Pero esta noche, la música se ha cortado de golpe. <b>Lord Barnaby Blackwood</b>, el implacable dueño del local y usurero de todos los presentes, yace asesinado en su despacho. La puerta principal está sellada a cal y canto: nadie saldrá de este cabaret hasta que se resuelva el misterio y se señale al culpable.
+                </p>
+            </div>
+
+            <!-- LISTA VISIBLE DIRECTA DE LOS SOSPECHOSOS Y SU ATREZO -->
+            <h3 style="margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #5a4723; padding-bottom: 8px;">
+                🎭 Quién es quién en el Cabaret (Personajes y Atrezo)
+            </h3>
+            <div style="margin-top: 15px;">
+                    
+                    <div class="roster-card">
+                        <b>Damián 'El Santo' Valdés (Rafael):</b> El alma de la fiesta. Parece un tipo corpulento y duro salido de los muelles, pero tiene una clase impecable, ingenio rápido y una sonrisa contagiosa. Es el rey de la pista y el primero en invitar a copas, salvo si su mujer le echa una mirada de advertencia: entonces se convierte en el hombre más dócil y discreto del reservado.
+                        <span class="roster-prop">👔 Atrezo distintivo: Nunca le verás sin su corbata elegante o pajarita torcida. Aflojársela o quitársela significa que las cosas se ponen feas o va a cantar la verdad.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Vera 'La Huracán' de la Vega (Encarni):</b> Un terremoto en tacones. Nadie en Nueva Orleans baila el foxtrot y el charlestón con tanta pasión ni arrastra a tanta gente al desastre como ella. Es adicta al riesgo, a la velocidad y a los rumores prohibidos; jamás pasa inadvertida en una sala.
+                        <span class="roster-prop">✨ Atrezo distintivo: Collar largo de perlas o diadema de plumas de charlestón. Jugar con las perlas entre los dedos denota nerviosismo o seducción.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Silvana 'La Bohemia' Gaultier (Inés):</b> Artista gráfica e ilustradora de vanguardia. De aspecto humilde, aura melancólica y generosidad infinita, siempre ofrece su ático para las juergas clandestinas y el jazz prohibido. Asegura que apenas le llega para aguarrás y lienzos baratos, pero guarda secretos dignos de un magnate.
+                        <span class="roster-prop">🎨 Atrezo distintivo: Boina ladeada o pañuelo de seda al cuello, y dedos con manchas fingidas de carboncillo.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Mateo 'El Porteño' Rossi (Nacho):</b> Buscavidas recién llegado de Buenos Aires vía La Habana. Elegante, fiestero, de labia seductora y siempre sonriente con un acento canchero inconfundible. Hace negocios al oído de todo el mundo y afirma que el tabaco es el único arte sincero que queda en el mundo.
+                        <span class="roster-prop">🚬 Atrezo distintivo: Un puro habano (apagado) en la comisura o asomando del chaleco. Encender una cerilla es su tic al mentir.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Dafne 'La Sirena' Mourlot (Nazaret):</b> Jefa administrativa de la firma de seguridad privada que custodia los caudales del cabaret. Voluptuosa, fría como el mármol y con un carácter imponente que hace temblar a los guardias. Lleva el brazo inmovilizado por un supuesto asalto, pero maneja las llaves de toda la ciudad.
+                        <span class="roster-prop">🧣 Atrezo distintivo: Pañuelo a modo de falso cabestrillo o gran brazalete metálico en el antebrazo.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Axel 'El Tuercas' Vane (Juan):</b> Mecánico prodigioso de los bólidos clandestinos de carreras de circuito y reparto nocturno de alcohol. Hombre de pocas palabras, mirada penetrante y manos que desarman un motor en plena oscuridad.
+                        <span class="roster-prop">🔧 Atrezo distintivo: Tirantes oscuros y un trapo de taller o llave pequeña asomando del bolsillo.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Dra. Beatrice Sola (Tania):</b> Prestigiosa médica y psiquiatra del sanatorio de la ciudad. Analítica, observadora implacable, madre reciente y de una compostura gélida. Disecciona las mentes de los presentes con solo escucharles hablar un minuto.
+                        <span class="roster-prop">👓 Atrezo distintivo: Gafas de concha fina en la mano o pequeña libreta médica con pluma.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Julian 'El Sombra' Croft (Javi):</b> Chófer de uniforme de la altísima alcurnia de Luisiana y marido de Beatrice. Silencioso como una estatua, ceremonioso y leal en apariencia. Sabe que el espejo retrovisor de una limusina ve más pecados que cualquier confesonario.
+                        <span class="roster-prop">🧤 Atrezo distintivo: Guantes blancos de chófer de lujo o gorra de plato. Quitarse un guante es su señal de alerta.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Ylva 'La Nórdica' Lindqvist (Gabi):</b> Alta funcionaria economista enviada por un sindicato bancario internacional para auditar los oscuros libros contables del cabaret y las deudas del difunto. Finge ser una lituana ingenua que apenas domina el idioma, pero sus cálculos matemáticos son letales.
+                        <span class="roster-prop">📊 Atrezo distintivo: Carpeta de balances contables bajo el brazo o broche plateado en la solapa.</span>
+                    </div>
+
+                    <div class="roster-card">
+                        <b>Thiago 'El Carioca' Da Silva (Rafael amigo):</b> El carismático jefe de sala y conserje de lujo de El Gato Tuerto. Brasileño de refinada cortesía, chaleco impecable y clavel en la solapa, se encarga de recibir a los clientes VIP, acomodarlos en sus reservados y supervisar que nunca falte el champán más exclusivo. Parece que su único afán es que la velada sea inolvidable, pero conoce todos los pasadizos, llaves y secretos de alcoba del cabaret.
+                        <span class="roster-prop">🌹 Atrezo distintivo: Clavel rojo en la solapa o pañuelo de seda llamativo en el bolsillo superior. Acomodarse el clavel indica que sabe algo que no está contando.</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FORMULARIO DE ACCESO -->
+            <div style="margin-top: 20px;">
+                <p class="timer-info">Introduce tus datos de acceso facilitados en tu papel:</p>
+                <select id="char-select">
+                    <option value="">-- Selecciona tu personaje --</option>
+                    <option value="damian">Damián 'El Santo' Valdés</option>
+                    <option value="vera">Vera 'La Huracán' de la Vega</option>
+                    <option value="silvana">Silvana 'La Bohemia' Gaultier</option>
+                    <option value="mateo">Mateo 'El Porteño' Rossi</option>
+                    <option value="dafne">Dafne 'La Sirena' Mourlot</option>
+                    <option value="axel">Axel 'El Tuercas' Vane</option>
+                    <option value="beatrice">Dra. Beatrice Sola</option>
+                    <option value="julian">Julian 'El Sombra' Croft</option>
+                    <option value="ylva">Ylva 'La Nórdica' Lindqvist</option>
+                    <option value="thiago">Thiago 'El Carioca' Da Silva</option>
+                </select>
+                <input type="password" id="char-pass" placeholder="Introduce tu contraseña secreta">
+                <button onclick="login()">Entrar a mi perfil</button>
+            </div>
         </div>
 
-        <!-- PANTALLA PRINCIPAL DE JUEGO -->
+        <!-- PANTALLA 2: PERFIL DE JUEGO -->
         <div id="game-section" class="hidden">
-            <h3 id="char-title" style="margin-bottom: 5px;"></h3>
-            <p class="timer-info" id="char-subtitle"></p>
 
-            <!-- CONTROLES DE RONDA -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px;">
-                <button onclick="startRound(1)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 1</button>
-                <button onclick="startRound(2)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 2</button>
-                <button onclick="startRound(3)" style="background:#333; color:#c5a059; border:1px solid #c5a059;">Iniciar Ronda 3</button>
-                <button onclick="startRound(4)" style="background:#501212; color:#fff; border:1px solid #ff4444;">Iniciar Ronda 4</button>
+
+            <!-- BLOQUE PREVIO AL ARRANQUE -->
+            <div id="pre-game-box" class="card" style="border-left-color: #f39c12; background: #261f12;">
+                <h4 style="color: #f39c12;">🍸 Reservado Privado (Lectura de Personaje)</h4>
+                <p style="margin: 5px 0 10px 0; font-size: 14px;">
+                    Lee atentamente tu ficha completa más abajo para meterte en tu papel y preparar tus argumentos. La investigación y el cronómetro de la <b>Ronda 1</b> comenzarán cuando el anfitrión dé la señal.
+                </p>
+                <div style="font-size: 14px; color: #e0e0e0;">
+                    👥 <b>Jugadores conectados en su perfil:</b> <span id="pregame-count" style="color:#2ecc71; font-weight:bold;">0</span> / 10
+                </div>
+
+                <!-- PANEL ESPECIAL PARA RAFAEL (DAMIÁN) -->
+                <div id="host-panel"
+                    style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #c5a059;">
+                    <p style="font-weight: bold; color: #d4af37; margin: 0 0 5px 0;">👑 Panel del Organizador (Rafael):
+                    </p>
+                    <div id="host-player-list" class="player-grid"></div>
+                    </button>
+
+                    <div style="text-align: center; margin-top: 8px;">
+                        <a href="javascript:void(0)" onclick="triggerRound(1)"
+                            style="color:#888; font-size:12px; text-decoration:underline;">
+                            Forzar inicio de Ronda 1 ahora (sin esperar a los 10)
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- CRONÓMETRO DE LA RONDA -->
-            <div class="clock-display" id="timer-clock">20:00</div>
+            <!-- CONTROLES DE RONDA Y CRONÓMETRO -->
+            <div id="active-game-box" class="hidden">
+                <div id="host-round-controls" style="display:none; margin-top: 10px;">
+                    <p class="timer-info" style="color:#c5a059; margin-bottom: 5px;">👑 Control de Rondas (Rafael):</p>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                        <button onclick="triggerRound(1)"
+                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
+                            1</button>
+                        <button onclick="triggerRound(2)"
+                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
+                            2</button>
+                        <button onclick="triggerRound(3)"
+                            style="padding:8px 4px; font-size:13px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda
+                            3</button>
+                        <button onclick="triggerRound(4)"
+                            style="padding:8px 4px; font-size:13px; background:#501212; color:#fff; border:1px solid #ff4444;">Ronda
+                            4</button>
+                    </div>
+                </div>
 
-            <!-- ESTADO ACTUAL DE LA HISTORIA ( GLOBAL - IGUAL PARA TODOS ) -->
-            <div class="round-box">
-                <h4 style="margin-top:0; color:#c5a059;">📢 Evolución de la Trama (Global)</h4>
-                <p id="global-story">Selecciona una ronda para iniciar el cronómetro y desvelar los acontecimientos.</p>
+                <div class="clock-display" id="timer-clock">20:00</div>
+
+                <div class="round-box">
+                    <h4 style="margin-top:0; color:#c5a059;">📢 Evolución de la Trama (Global)</h4>
+                <div class="card" style="border-left-color: #2e86c1;">
+                    <h4>🔍 Información Confidencial (Tu Pista Privada)</h4>
+                    <p id="char-round-info"></p>
+                </div>
             </div>
 
-            <!-- PERFIL PERSONAL -->
+            <!-- FICHA PERMANENTE DEL PERSONAJE -->
             <div class="card">
                 <h4>Tu Fachada Pública</h4>
                 <p id="char-fachada"></p>
             </div>
-            
-            <div class="card" style="border-left-color: #a93226;">
-                <h4>Tu Secreto Oscuro</h4>
-                <p id="char-secreto"></p>
-            </div>
 
-            <!-- INFORMACIÓN CONFIDENCIAL DE TU PERFIL (DIFERENTE PARA CADA UNO) -->
-            <div class="card" style="border-left-color: #2e86c1;">
-                <h4>🔍 Información Confidencial (Tu Perfil)</h4>
-                <p id="char-round-info">Selecciona una ronda para consultar tus pistas privadas.</p>
-            </div>
 
             <div class="card" style="border-left-color: #2ecc71;">
                 <h4>Frase Clave Obligatoria</h4>
                 <p id="char-frase" style="font-style: italic;"></p>
             </div>
 
-            <!-- MENSAJE SECRETO DEL ASESINO (SOLO SE MUESTRA EN RONDA 4 AL ASESINO) -->
+            <!-- MENSAJE SECRETO FINAL (SOLO EN RONDA 4) -->
             <div class="card" id="killer-reveal" style="border-left-color: #ff0000; display:none; background:#2a1212;">
                 <h4 style="color:#ff4444;">⚠️ MENSAJE ULTIMATUM (SOLO PARA TI)</h4>
                 <p id="killer-text" style="font-weight: bold; color:#ffdddd;"></p>
             </div>
 
-            <button onclick="location.reload()" style="background: #333; color: #fff; margin-top: 25px;">Cerrar Sesión / Cambiar</button>
         </div>
     </div>
 
     <script>
+        const GAME_TOPIC = "misterio_gato_tuerto_cabaret_partida_v3";
+        const NTFY_API = "https://ntfy.sh/" + GAME_TOPIC;
+
+        const playerNames = {
+            damian: "Rafael",
+            vera: "Encarni",
+            silvana: "Inés",
+            mateo: "Nacho",
+            dafne: "Nazaret",
+            axel: "Juan",
+            beatrice: "Tania",
+            julian: "Javi",
+            ylva: "Gabi",
+            thiago: "Rafael (amigo)"
+        };
+
         const passwords = {
             damian: "toreo20",
             vera: "foxtrot1",
@@ -114,201 +244,390 @@
         const characters = {
             damian: { 
                 title: "Damián 'El Santo' Valdés", subtitle: "El alma de la fiesta / Inversor secreto",
-                fachada: "El alma de la fiesta, sonriente, pasota que deja tomar decisiones a su mujer.", 
-                secreto: "Inversor fantasma en la quiebra de los astilleros del puerto; Blackwood te exigía el 80% o destapaba tu fraude.", 
-                frase: "'Hombre, ¿matar yo a Barnaby? ¡Si con lo mal que llevo la contabilidad, hacer cuentas va contra mi filosofía!'",
+                fachada: "El alma indiscutible de cualquier fiesta en el French Quarter. Tipo corpulento, risueño y con una elegancia pícara, siempre listo para invitar a rondas de ginebra y contar chistes sobre los alguaciles locales. Aparenta ser un bonachón despreocupado que delega cualquier decisión seria en su mujer, pero tras esa sonrisa hay un ojo clínico para los negocios turbios.", 
+                secreto: "Eres inversor fantasma en la quiebra fraudulenta de los astilleros del puerto fluvial. Lord Blackwood financió tu tapadera y esta misma noche te exigió el 80% de los beneficios o entregaría tus pagarés al fiscal federal. Le gritaste que antes lo verías flotando en el Misisipi. Viste a Mateo merodeando el despacho con una toalla.", 
+                frase: "'¡Por todos los santos! ¿Matar yo a Barnaby? ¡Si con lo mal que llevo los números, cuadrar cuentas con la muerte va contra mi filosofía!'",
                 intel: {
-                    1: "Alguien ha visto tu nombre en los extractos bancarios preliminares de la entrada del cabaret.",
-                    2: "Rumor de pasillo: Se comenta que alguien del grupo frecuentaba los astilleros abandonados a medianoche.",
-                    3: "Descubres con horror que tu letra de inversor fue vista por Vera... y parece que sospecha de ti.",
-                    4: "¡El cerco se estrecha! Alguien ha depositado un recibo de los astilleros manchado de sangre junto al cadáver."
+                    1: "Alguien vio tu nombre garabateado en un recibo bancario manchado sobre el mostrador del guardarropa.",
+                    2: "Viste a Mateo y a Dafne intercambiar una mirada gélida justo cuando las luces del salón parpadearon antes del crimen.",
+                    3: "Descubres horrorizado que tu letra bancaria fue interceptada por Vera, y parece dispuesta a venderte al mejor postor.",
+                    4: "¡El cerco se cierra! Un extracto bancario de los astilleros ha aparecido bajo el cuerpo ensangrentado de Blackwood."
                 }
             },
-            vera: { 
-                title: "Vera de la Vega", subtitle: "La hiperactiva / Amante del riesgo",
-                fachada: "Hiperactiva, vibrante, arrastra a todo el mundo al baile y a escuchar música industrial.", 
-                secreto: "Firmaste letras de cambio con tu piso como aval. Mantienes un idilio secreto e inconfesable con el marido de otra (Julian).", 
-                frase: "'¡La vida son dos días, y si la música industrial no ahogara los gritos de este antro, ya me habría tirado!'",
+            vera: {
+                title: "Vera 'La Huracán' de la Vega", subtitle: "La bailarina del foxtrot / Reina del riesgo",
+                fachada: "Pura dinamita social y reina de la noche de Nueva Orleans. Hiperactiva, magnética y amante del Hot Jazz salvaje que resuena en los sótanos, arrastra a todo el mundo a bailar el foxtrot más vertiginoso. Su risa llena el reservado y su conversación salta de amantes a carreras clandestinas, sin dejar títere con cabeza.", 
+                secreto: "Avalaste tus deudas de ruleta con las escrituras del piso de tu familia. Además, mantienes un romance clandestino y ardiente con Julian (el chófer señorial, marido de la implacable doctora Beatrice). Blackwood tenía tu carta de desahucio en su chaqueta y amenazaba con entregársela a Beatrice esta misma madrugada.", 
+                frase: "'¡La vida son dos días de charlestón! Si las trompetas de este antro no ahogaran los gritos, ya me habría arrojado al río!'",
                 intel: {
-                    1: "El bebé no para de llorar arriba en la planta de la nodriza, alterando los nervios de todos.",
-                    2: "Alguien ha interceptado una notita perfumada tuya dirigida a Julian (el marido de Beatrice). ¡Cuidado con que no se entere nadie!",
-                    3: "Te percataste de que Blackwood guardaba la letra de cambio de tu piso en su chaqueta justo antes del apagón.",
-                    4: "Has encontrado una horquilla de pelo idéntica a la tuya tirada justo en el umbral del despacho de la víctima."
+                    1: "El bebé de Beatrice llora desconsolado en la planta de la nodriza, y notas que Julian mira la escalera con demasiada insistencia.",
+                    2: "Alguien ha interceptado una notita tuya perfumada con esencia de jazmín dirigida a Julian. ¡Si Beatrice la lee, te destruirá!",
+                    3: "Viste a Julian y a Axel secreteándose junto al Hispano-Suiza aparcado fuera minutos antes del apagón.",
+                    4: "Encuentran una horquilla idéntica a la tuya caída justo en el umbral del despacho de la víctima."
                 }
             },
             silvana: { 
-                title: "Silvana 'La Muda' Gaultier", subtitle: "La artista bohemia / Rica oculta",
-                fachada: "Artista gráfica austera, humilde y agradecida que presta su casa para todo.", 
-                secreto: "Eres obscenamente rica (heredera del caucho); falsificaste tu ruina y coleccionas sintetizadores de vanguardia en secreto.", 
-                frase: "'Yo solo soy una pobre ilustradora, por el amor de Dios... ¡si apenas tengo para disolvente de óleos!'",
+                title: "Silvana 'La Bohemia' Gaultier", subtitle: "La ilustradora bohemia / Millonaria oculta",
+                fachada: "Artista gráfica humilde y austera que viste ropas bohemias y siempre tiene restos de carboncillo en las uñas. Presta su ático bohemio para que los músicos negros toquen el Hot Jazz prohibido lejos de las redadas. Es dulce, complaciente y parece vivir del aire y de la caridad de sus amigos.", 
+                secreto: "Eres la heredera secreta de una descomunal fortuna del caucho colonial; fingiste tu ruina para escapar de tu familia y coleccionas en secreto carísimos gramófonos dorados e instrumentos únicos traídos de Europa. Blackwood tenía en su caja fuerte el testamento original de tu padre y planeaba chantajearte con tu verdadera identidad.", 
+                frase: "'Yo solo soy una pobre pintora bohemia... ¡por la Virgen, si apenas tengo para aguarrás y carboncillos!'",
                 intel: {
-                    1: "Oyes comentarios sobre lo caro que cuesta el material importado de tus óleos y sintetizadores.",
-                    2: "Te llega el soplo de que Thiago (el brasileño) anda buscando comprador para una fortuna en bonos coloniales de caucho.",
-                    3: "Alguien ha robado un catálogo de tus sintetizadores alemanes de la mesa del recibidor.",
-                    4: "Descubres que el testamento original de tus padres estaba sobre el escritorio de Blackwood... y ha desaparecido."
+                    1: "Escuchas comentarios de Thiago sobre bonos de caucho extranjero; te aterra que descubra de dónde viene tu dinero.",
+                    2: "Ylva (la economista) ha estado revisando unas facturas de material de bellas artes de París que están a tu nombre.",
+                    3: "Alguien ha abierto el bolso de tus bocetos y ha visto un catálogo de antigüedades que vale miles de dólares.",
+                    4: "Descubres que la caja fuerte de Blackwood está forzada y que el testamento de tu padre ha desaparecido de su interior."
                 }
             },
             mateo: { 
-                title: "Mateo 'El Porteño' Rossi", subtitle: "El contrabandista de puros",
-                fachada: "Inmigrante argentino canchero, fiestero y buscavidas con un cigarrillo en la boca.", 
-                secreto: "Contrabandista de puros habanos; le robaste un cargamento entero a Blackwood que este te iba a confiscar.", 
-                frase: "'Che, ¿yo? ¡A mí el viejo me caía pesado, pero jamás le robaría ni un triste puro a nadie!'",
+                title: "Mateo 'El Porteño' Rossi", subtitle: "El contrabandista de tabaco / Encantador de serpientes",
+                fachada: "Inmigrante argentino con porte de galán de tango, chaleco impecable y un cigarro habano siempre encendido entre los labios. Fiestero, pícaro y de verbo ágil, jura que está en Nueva Orleans solo para importar el mejor tabaco de Vuelta Abajo y hacer amigos con dinero.", 
+                secreto: "El tabaco es solo una pantalla: robaste un cargamento entero de licor de contrabando y diamantes que pertenecía a Blackwood. Este te tendió una trampa y te citó en su despacho para que firmaras tu propia ruina o entregarte a la banda rival del puerto. Odias a Blackwood con toda tu alma.", 
+                frase: "'¡Che, viejo, pará la mano! ¿Yo asesino? ¡A mí el difunto me caía pesado, pero jamás le levantaría la mano a nadie!'",
                 intel: {
-                    1: "Notas un fuerte olor a tabaco negro cubano de contrabando en la suela de tus zapatos.",
-                    2: "Dafne te ha enviado una seña disimulada pidiéndote explicaciones sobre los paquetes del almacén.",
-                    3: "Ves a Axel (el mecánico) merodeando sospechosamente cerca de los conductos de ventilación del sótano.",
-                    4: "Encuentras una caja de puros robada con las iniciales de Blackwood tirada debajo de una mesa."
+                    1: "Notas un persistente olor a pólvora y alcohol destilado en las mangas de tu propia chaqueta.",
+                    2: "Dafne te hace una señal de clave bancaria desde la esquina: solo vosotros dos sabéis cómo se abre la puerta interior.",
+                    3: "Ves a Axel buscar con disimulo una llave pesada que ha desaparecido de su caja de herramientas.",
+                    4: "Aparece una caja de puros robada con las iniciales de Blackwood escondida bajo el sillón donde tú estabas sentado."
                 }
             },
-            dafne: { 
-                title: "Dafne 'La Sirena' Mourlot", subtitle: "La administrativa / Fraude del seguro",
-                fachada: "Administrativa de baja por 'brazo roto', voluptuosa y la que lleva los pantalones.", 
-                secreto: "El brazo roto es un fraude de seguro; intentaste robar las joyas de la caja fuerte de Blackwood.", 
-                frase: "'Mirad mi brazo, incapaz soy de alzar un pisapapeles para reventarle la crisma a nadie!'",
+            dafne: {
+                title: "Dafne 'La Sirena' Mourlot", subtitle: "La jefa de seguridad / Falsa lisiada",
+                fachada: "Directora de administración de la agencia de seguridad privada que vigila los locales nocturnos del distrito. De presencia arrebatadora, voz grave y temple de acero, lleva el brazo en cabestrillo por un supuesto tiroteo en los muelles. Es quien custodia los códigos, las llaves maestras y los cerrojos del cabaret.", 
+                secreto: "Tu lesión de brazo es una farsa total: una coartada perfecta para moverte sin sospechas. Eres una maestra abriendo cajas fuertes y estabas compinchada en desvalijar el depósito secreto de Blackwood mientras todos bailaban foxtrot en el salón. Viste a Mateo entrar al pasillo del despacho poco antes del grito.", 
+                frase: "'¡Mirad este cabestrillo! ¿Cómo demonios voy a levantar un pisapapeles de mármol para romperle la crisma a un hombre?'",
                 intel: {
-                    1: "El cabestrillo te pesa horrores y notas que algunos sospechan que mueves el brazo más de la cuenta.",
-                    2: "Has intentado ligar la atención de Mateo para desviar las sospechas sobre tus deudas de juego.",
-                    3: "Alguien ha abierto el pestillo de tu férula mientras dormías en el sofá. ¡Alguien conoce tu secreto!",
-                    4: "El joyero de la caja fuerte de Blackwood apareció en el suelo cerca de ti con marcas de forcejeo."
+                    1: "Sientes que el cabestrillo te delata: has movido los dedos con demasiada soltura delante de Beatrice.",
+                    2: "Sabes perfectamente que la cerradura del despacho privado de Blackwood fue engrasada esta misma tarde con grasa de coche.",
+                    3: "Alguien intentó forzar el pestillo de tu bolso mientras charlabas con Mateo en la barra.",
+                    4: "El joyero de caudales de Blackwood ha aparecido tirado cerca de ti, con signos de haber sido abierto con llave maestra."
                 }
             },
-            axel: { 
-                title: "Axel 'El Tuercas' Vane", subtitle: "El mecánico de los bólidos",
-                fachada: "Mecánico silencioso hiperenfocado en su Ford Model A de carreras clandestinas.", 
-                secreto: "Blindabas los coches de la banda de Blackwood; este iba a delatar a toda su red ante la policía.", 
-                frase: "'Un buen motor de Ford Model A no hace ruido; el difunto aceleraba demasiado y gripó el motor.'",
+            axel: {
+                title: "Axel 'El Tuercas' Vane", subtitle: "El mecánico de bólidos / Socio de la noche",
+                fachada: "Mecánico taciturno de mirada acerada y tirantes negros, obsesionado con los motores sobrealimentados de los Ford y Duesenberg de carreras nocturnas. Habla poco, bebe ginebra pura y parece no tener ojos más que para las bujías y la velocidad.", 
+                secreto: "Blindas los coches de los contrabandistas y eres socio en la sombra de Julian (el chófer de la alta sociedad), quien te trae los vehículos de los millonarios para saquear recambios caros y montar dobles fondos para armas. Blackwood amenazó con delatar todo vuestro garaje clandestino al sheriff esta noche.", 
+                frase: "'Un buen motor afinado no hace ruido de más; el difunto aceleró a fondo en una curva cerrada y reventó la biela.'",
                 intel: {
-                    1: "Revisaste los bajos del Ford Model A aparcado fuera por si la policía os seguía la pista.",
-                    2: "Escuchas una fuerte discusión entre Beatrice y Blackwood sobre pagarés bancarios robados.",
-                    3: "Notas que faltan dos llaves inglesas pesadas del maletín de herramientas del taller del cabaret.",
-                    4: "La mancha de grasa del pomo del despacho de Blackwood coincide con la grasa de motor que usas."
+                    1: "Revisaste los bajos del Hispano-Suiza que aparcó Julian en el callejón: hay restos de barro fresco del embarcadero.",
+                    2: "Escuchas una discusión brutal entre Beatrice y Blackwood sobre pagarés bancarios envenenados.",
+                    3: "Notas que falta una de tus llaves inglesas más pesadas, la misma que le prestaste a Julian antes de cenar.",
+                    4: "Una huella de grasa de motor mezclada con sangre fresca ha aparecido en el pomo de la puerta de Blackwood."
                 }
             },
-            beatrice: { 
-                title: "Dra. Beatrice Sola", subtitle: "La psiquiatra / Médica del sanatorio",
-                fachada: "Psiquiatra formal, analítica, madre reciente con compostura de acero.", 
-                secreto: "Usabas sedantes del sanatorio para robar pagarés a Blackwood y financiar tu nueva vida familiar.", 
-                frase: "'Como psiquiatra os aseguro que el único desequilibrado en esta sala era el difunto.'",
+            beatrice: {
+                title: "Dra. Beatrice Sola", subtitle: "La médica analítica / Dama del sanatorio",
+                fachada: "Eminente psiquiatra y forense del sanatorio de Luisiana, madre reciente con una serenidad imperturbable que desarma a cualquiera. Viste con rigor científico, mira a los ojos con frialdad y analiza los gestos nerviosos de todos como si fueran especímenes de laboratorio.", 
+                secreto: "Falsificabas historiales psiquiátricos y sustraías morfina del sanatorio para revenderla a la red de Blackwood y asegurar el futuro económico de tu recién nacido. Blackwood amenazaba con publicar tu firma médica en la prensa si no le entregabas la mitad de tu consulta privada. Desconfías ciegamente de tu marido Julian.", 
+                frase: "'Como psiquiatra os aseguro que el único psicópata peligroso en esta habitación era el difunto Lord Blackwood.'",
                 intel: {
-                    1: "El llanto del bebé en la planta alta no te deja concentrarte en el perfil psicológico de los presentes.",
-                    2: "Ves que tu marido Julian actúa con una frialdad inusual tras la puerta del despacho.",
-                    3: "Alguien ha robado un vial de clorofórmio de tu maletín médico que tenías guardado en el perchero.",
-                    4: "Encuentras tu recetario médico con una nota firmada por Blackwood exigiendo la mitad de los pagarés."
+                    1: "El llanto de tu bebé arriba te taladra los oídos; notas que Julian esquiva tu mirada cada vez que lo mencionan.",
+                    2: "Interceptas una mirada de complicidad y deseo prohibido entre tu marido Julian y Vera en mitad del salón.",
+                    3: "Alguien ha sustraído un frasco de éter de tu maletín médico dejado en el perchero de la entrada.",
+                    4: "Encuentras tu recetario médico firmado con una anotación de chantaje de puño y letra de Blackwood."
                 }
             },
-            julian: { 
-                title: "Julian 'El Sombra' Croft", subtitle: "El marido silencioso / Expolicía",
-                fachada: "Marido de Beatrice, enigmático, extremadamente silencioso y discreto.", 
-                secreto: "Expolicía corrupto y matón de Blackwood; robaste la caja fuerte la misma noche del crimen.", 
-                frase: "'En mi antigua profesión aprendí algo: el que habla demasiado no ve nada. Y yo no vi nada.'",
+            julian: {
+                title: "Julian 'El Sombra' Croft", subtitle: "El chófer de la alcurnia / Marido reservado",
+                fachada: "Chófer privado de las familias más adineradas del distrito jardín y marido formal de Beatrice. Viste con pulcritud ceremonial, guantes inmaculados y una devoción fingida al silencio profesional. Nadie repara en su presencia, lo que le convierte en el hombre más peligroso de la sala.", 
+                secreto: "Trasportas mercancía prohibida en los coches señoriales y desvías piezas caras con Axel (el mecánico). Además, mantienes un idilio clandestino con Vera de la Vega, a quien prometiste fugarte esta noche. Blackwood os sorprendió besándoos en el callejón y os exigió 5.000 dólares bajo amenaza de muerte.", 
+                frase: "'En mi oficio de chófer aprendí la regla de oro: mirar por el retrovisor, callar y acelerar. Y yo esta noche solo he conducido.'",
                 intel: {
-                    1: "Vigilas discretamente cada puerta de salida del cabaret por orden de la seguridad privada.",
-                    2: "Mantienes miradas cómplices con Vera mientras el resto discute acaloradamente sobre las deudas.",
-                    3: "Encontraste la combinación de la caja fuerte abierta de par en par... y el dinero ya no estaba.",
-                    4: "Alguien te vio salir del despacho con las manos ensangrentadas... aunque tú juras que solo fue un tropiezo."
+                    1: "Aparcaste el Hispano-Suiza en la puerta trasera; Axel y tú sabéis perfectamente qué hay escondido en el doble fondo.",
+                    2: "Cruzas miradas ardientes con Vera mientras el resto discute; rezas para que tu mujer Beatrice no ate cabos.",
+                    3: "Viste la combinación de la caja fuerte de Blackwood escrita en un papel arrugado sobre la mesa del despacho.",
+                    4: "Alguien te vio salir del pasillo del despacho con una mancha roja en los puños... aunque juras que era grasa de freno."
                 }
             },
-            ylva: { 
-                title: "Ylva 'La Nórdica' Lindqvist", subtitle: "La lituana / Espía encubierta",
-                fachada: "Lituana rubia que 'apenas entiende el español', sonriente y fan de la electrónica.", 
-                secreto: "Espía industrial internacional; Blackwood descubrió tu identidad y te exigía 10.000 dólares oro.", 
-                frase: "'¿Mande? Yo no hablar bien español... ¿Quién es ese Barnaby? ¿Es un queso?'",
+            ylva: {
+                title: "Ylva 'La Nórdica' Lindqvist", subtitle: "La auditora bancaria / Espía de cuentas",
+                fachada: "Auditora implacable graduada en economía internacional, llegada a Nueva Orleans para revisar los balances del cabaret. Se hace la extranjera distraída que apenas entiende las expresiones locales y sonríe fingiendo inocencia, pero en su cabeza calcula cada centavo con precisión matemática.", 
+                secreto: "Descubriste un agujero financiero de 200.000 dólares: Blackwood usaba el cabaret para saquear fondos de inversores extranjeros y blanquear dinero de sobornos. Estabas a punto de congelar todas sus cuentas en Nueva York. Blackwood te encerró en el despacho antes de cenar amenazándote con un revólver si no firmabas la auditoría.", 
+                frase: "'¿Mande usted? Mi español no ser muy perfecto... ¿Quién es ese señor Barnaby? ¿Es un tipo de queso francés?'",
                 intel: {
-                    1: "Sonríes amablemente mientras finjes no enterarte de los gritos que provienen del pasillo.",
-                    2: "Te haces la sueca cuando Silvana empieza a hablar de sus carísimos sintetizadores industriales.",
-                    3: "Interceptas un telegrama cifrado en clave rusa tirado en una papelera del reservado.",
-                    4: "Dejas escapar una frase perfecta en perfecto español castellano cuando mencionan la palabra 'asesinato'."
+                    1: "Llevas en tu libreta el registro exacto de las deudas de Damián, Vera y Mateo: cualquiera de los tres tenía motivos para matarlo.",
+                    2: "Ves que Thiago se pone lívido cada vez que mencionas las transferencias bancarias de Río de Janeiro.",
+                    3: "Interceptas un memorando cifrado sobre las cuentas de Silvana: ¡descubres que es la heredera de una fortuna colosal!",
+                    4: "Dejas escapar una frase en perfecto castellano castizo cuando alguien grita que la policía corrupta viene de camino."
                 }
             },
-            thiago: { 
-                title: "Thiago 'El Carioca' Da Silva", subtitle: "El brasileño / Prófugo de la justicia",
-                fachada: "Brasileño recién llegado tras una boda exprés secreta, sonriente y desubicado.", 
-                secreto: "Prófugo de la justicia internacional; usabas el cabaret para blanquear dinero de apuestas clandestinas.", 
-                frase: "'Rapaziada, eu no tengo nada que ver! Acabo de aterrizar y ni sé dónde se compra el pan.'",
+            thiago: {
+                title: "Thiago 'El Carioca' Da Silva", subtitle: "El jefe de sala del cabaret / Ojos y oídos de la noche",
+                fachada: "El distinguido jefe de sala y conserje de 'El Gato Tuerto'. Brasileño de refinada cortesía, chaleco impecable y un clavel rojo en la solapa, recibe a los clientes más acaudalados, atiende sus caprichos y supervisa que el licor clandestino nunca falte en las copas. Conoce al dedillo quién entra, quién sale y en qué reservado se sienta cada pareja.", 
+                secreto: "Tu sueldo de jefe de sala es una miseria comparado con tu verdadero negocio: cobrabas sobornos a los clientes para no registrar sus visitas y robabas botellas de coñac francés de la bodega privada de Blackwood para revenderlas a Mateo. Esta misma noche, Blackwood descubrió que le faltaban 500 dólares de la recaudación de la caja del bar y amenazó con entregarte a la policía y dejarte en la calle.", 
+                frase: "'¡Por favor, señores, compostura! Mi único deber en este cabaret es que las copas estén llenas y el ambiente sea exquisito. ¡Yo solo soy el jefe de sala!'",
                 intel: {
-                    1: "Intentas seguir el ritmo de las conversaciones locales mientras pides un vaso de agua.",
-                    2: "Ves que Ylva te mira con demasiada atención cuando habláis de cruzar la frontera de Portugal.",
-                    3: "Encuentras un pasaporte falso con tu foto tirado debajo del gramófono del salón principal.",
-                    4: "Te acusan de haber entrado el último al reservado antes de que se descubriera el cuerpo."
+                    1: "Viste entrar a Blackwood a su despacho visiblemente alterado tras discutir con alguien en la barra.",
+                    2: "Sabes que la llave de la bodega y del reservado privado estuvo colgada en tu casillero hasta poco antes del apagón.",
+                    3: "Ves a Dafne y a Mateo merodeando cerca de la puerta trasera de servicio que tú sueles dejar entreabierta.",
+                    4: "Varios testigos te acusan de haber sido el último en entrar al despacho a llevarle una copa de oporto a Blackwood antes del crimen."
                 }
             }
         };
 
         const globalStories = {
-            1: "<b>RONDA 1 - El Hallazgo del Cadáver (Minuto 0):</b> Lord Barnaby Blackwood ha aparecido muerto en su despacho privado del Cabaret 'El Gato Tuerto'. Tiene un pesado pisapapeles de mármol clavado en el cráneo. La puerta estaba cerrada por dentro. Arriba, el bebé de la pareja berrea desconsolado mientras la nodriza alemana amenaza con colapsar. ¡Todos sois sospechosos! Comienza el debate.",
-            2: "<b>RONDA 2 - La Libreta de Deudas y Secretos (Minuto 20):</b> Aparece la libreta negra de Blackwood sobre la barra. En ella se detallan deudas asfixiantes, chantajes y chanchullos de todos los presentes. Además, empiezan a circular rumores sobre miradas cruzadas, cartas de amor furtivas y alianzas extrañas entre algunos invitados. ¡La tensión en la mesa se dispara!",
-            3: "<b>RONDA 3 - Las Pistas del Crimen (Minuto 40):</b> La policía corrupta está al otro lado de la puerta y amenaza con entrar en 20 minutos. Se han encontrado huellas borradas a medias en el pisapapeles y objetos personales de varios sospechosos revueltos en la escena del crimen. Las coartadas empiezan a hacer aguas por todas partes. ¡Preparad vuestras acusaciones!",
-            4: "<b>RONDA 4 - Desenlace y Revelación (Minuto 60):</b> ¡Ronda Final! El cerco se cierra. La tensión llega a su punto máximo. En este preciso instante, **el verdadero asesino** descubrirá su secreto en su dispositivo. Es hora de usar las frases clave obligatorias, defenderse con uñas y dientes y votar al culpable definitivo para ver quién gana la partida."
+            1: "<b>RONDA 1 - El Hallazgo del Cadáver (Minuto 0):</b> Lord Barnaby Blackwood yace con el cráneo destrozado junto a su escritorio privado en 'El Gato Tuerto'. El arma: su pesado pisapapeles de mármol de Carrara. La puerta fue abierta desde dentro y la caja fuerte presenta signos de haber sido manipulada con llave maestra. Arriba, el bebé de Beatrice berrea mientras las trompetas de Hot Jazz se han callado de golpe. ¡Nadie sale de este reservado! Comienza el careo.",
+            2: "<b>RONDA 2 - La Libreta de Chantajes (Minuto 20):</b> Aparece la libreta negra de Blackwood sobre el piano. En sus páginas de piel hay pagarés asfixiantes, desfalcos bancarios, recetas de morfina y cartas de amor clandestinas de los presentes. La tensión explota: las miradas de odio y las acusaciones cruzadas se disparan en todas direcciones.",
+            3: "<b>RONDA 3 - El Asedio Policial y las Pruebas (Minuto 40):</b> La policía de Nueva Orleans está al otro lado de la reja exterior y amenaza con tirar la puerta en 20 minutos. Han aparecido objetos personales de varios sospechosos revueltos en la escena del crimen, huellas de grasa y cerraduras forzadas. Las coartadas se derrumban. ¡Preparen sus acusaciones finales!",
+            4: "<b>RONDA 4 - Desenlace y Votación Final (Minuto 60):</b> ¡Ronda Final! El cerco se cierra. En este instante, <b>los dos asesinos compinchados</b> recibirán su mensaje secreto en su dispositivo. Es la hora de utilizar la frase clave obligatoria, defender la inocencia con uñas y dientes y votar a los dos culpables para ver quién sobrevive a la noche."
         };
 
-        let currentCharacterKey = "";
-        let timerInterval = null;
+        // IDENTIDADES DE LOS DOS ASESINOS COMPINCHADOS EN BASE64 PARA EVITAR AUTO-SPOILERS A RAFAEL
+        // (Al decodificarse en tiempo de ejecución, el sistema sabe quiénes son los 2 cómplices sin mostrar sus nombres en el código)
+        const CIPHER_CULPRITS = ["bWF0ZW8=", "ZGFmbmU="]; // Hash seguro anti-spoiler
+        function isCulprit(charKey) {
+            try {
+                return CIPHER_CULPRITS.map(c => atob(c)).includes(charKey);
+            } catch (e) { return false; }
+        }
+
+        let currentCharacterKey = localStorage.getItem("gato_char_key") || "";
+        let connectedPlayers = new Set();
+        let lastResetTimestamp = 0;
+        let activeRound = 0;
+        let roundStartTimestamp = null;
+
+        window.addEventListener("DOMContentLoaded", () => {
+            initSync();
+            setInterval(updateClock, 1000);
+
+            if (currentCharacterKey && characters[currentCharacterKey]) {
+                const savedPass = localStorage.getItem("gato_char_pass");
+                if (savedPass === passwords[currentCharacterKey]) {
+                    showGameProfile();
+                    broadcastJoin(currentCharacterKey);
+                }
+            }
+        });
 
         function login() {
             const select = document.getElementById('char-select').value;
             const pass = document.getElementById('char-pass').value.trim();
 
-            if(!select) { alert('Por favor, selecciona tu personaje.'); return; }
-            if(pass !== passwords[select]) { alert('Contraseña incorrecta. Pídesela al mayordomo.'); return; }
+            if (!select) {
+                alert('Por favor, selecciona tu personaje.');
+                return;
+            }
+            if (pass !== passwords[select]) {
+                alert('Contraseña incorrecta. Revisa el papel que te facilitó el mayordomo.');
+                return;
+            }
 
             currentCharacterKey = select;
-            const char = characters[select];
+            localStorage.setItem("gato_char_key", select);
+            localStorage.setItem("gato_char_pass", pass);
 
+            showGameProfile();
+            broadcastJoin(currentCharacterKey);
+        }
+
+        function logout() {
+            localStorage.removeItem("gato_char_key");
+            localStorage.removeItem("gato_char_pass");
+            location.reload();
+        }
+
+        function showGameProfile() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('game-section').classList.remove('hidden');
+
+            const char = characters[currentCharacterKey];
             document.getElementById('char-title').innerText = char.title;
-            document.getElementById('char-subtitle').innerText = char.subtitle;
+            document.getElementById('char-subtitle').innerText = `${char.subtitle} | Jugador: ${playerNames[currentCharacterKey]}`;
             document.getElementById('char-fachada').innerText = char.fachada;
             document.getElementById('char-secreto').innerText = char.secreto;
             document.getElementById('char-frase').innerText = char.frase;
 
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('game-section').classList.remove('hidden');
-        }
-
-        function startRound(roundNum) {
-            // Limpiar temporizador previo si existiera
-            if(timerInterval) clearInterval(timerInterval);
-
-            // Actualizar texto global idéntico para todos
-            document.getElementById('global-story').innerHTML = globalStories[roundNum];
-
-            // Actualizar pista confidencial del perfil personal
-            const char = characters[currentCharacterKey];
-            document.getElementById('char-round-info').innerText = char.intel[roundNum];
-
-            // Lógica del Asesino Secreto en la Ronda 4 (El asesino es Julian)
-            const killerReveal = document.getElementById('killer-reveal');
-            const killerText = document.getElementById('killer-text');
-
-            if (roundNum === 4 && currentCharacterKey === 'julian') {
-                killerReveal.style.display = 'block';
-                killerText.innerText = "¡ERES TÚ! Descubriste anoche que Blackwood iba a echarte la culpa de todo el chanchullo de la comisaría. Entraste en su despacho, forcejeasteis y le golpeaste con el pisapapeles. Tu coartada falló. ¡Sobrevive a la acusación final y defiende tu pellejo!";
-            } else if (roundNum === 4) {
-                killerReveal.style.display = 'block';
-                killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> Revisa las pruebas, acusa a los demás, vigila las coartadas y descubre quién cometió el crimen para ganar la partida.";
-            } else {
-                killerReveal.style.display = 'none';
+            if (currentCharacterKey === 'damian') {
+                document.getElementById('host-panel').style.display = 'block';
+                document.getElementById('host-round-controls').style.display = 'block';
+                document.getElementById('host-reset-area').style.display = 'block';
             }
 
-            // Iniciar cuenta atrás de 20 minutos (1200 segundos)
-            let totalSeconds = 20 * 60;
-            const clockElement = document.getElementById('timer-clock');
+            renderHostLobby();
+            applyStateUI();
+        }
 
-            timerInterval = setInterval(() => {
-                let minutes = Math.floor(totalSeconds / 60);
-                let seconds = totalSeconds % 60;
-                
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-                
-                clockElement.innerText = minutes + ":" + seconds;
+        function initSync() {
+            loadEventHistory();
 
-                if (totalSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    clockElement.innerText = "¡TIEMPO AGOTADO! Vota o avanza de ronda";
-                } else {
-                    totalSeconds--;
+            try {
+                const eventSource = new EventSource(`${NTFY_API}/sse`);
+                eventSource.onmessage = (e) => {
+                    try {
+                        const data = JSON.parse(e.data);
+                        if (data.event === "message" && data.message) {
+                            handleGameEvent(JSON.parse(data.message));
+                        }
+                    } catch (err) {}
+                };
+            } catch (err) {}
+
+            setInterval(loadEventHistory, 3000);
+        }
+
+        async function loadEventHistory() {
+            try {
+                const response = await fetch(`${NTFY_API}/json?poll=1`);
+                if (!response.ok) return;
+                const text = await response.text();
+                const lines = text.trim().split("\n");
+                for (const line of lines) {
+                    if (!line) continue;
+                    try {
+                        const data = JSON.parse(line);
+                        if (data.event === "message" && data.message) {
+                            handleGameEvent(JSON.parse(data.message));
+                        }
+                    } catch (e) {}
                 }
-            }, 1000);
+            } catch (err) {}
+        }
+
+        async function sendGameEvent(payload) {
+            try {
+                await fetch(NTFY_API, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {}
+        }
+
+        function broadcastJoin(charKey) {
+            sendGameEvent({ type: "JOIN", char: charKey, timestamp: Date.now() });
+        }
+
+        function triggerRound(roundNum) {
+            sendGameEvent({ type: "START_ROUND", round: roundNum, timestamp: Date.now() });
+        }
+
+        function resetGame() {
+            if (!confirm("¿Seguro que quieres reiniciar la partida a 0?")) return;
+            sendGameEvent({ type: "RESET", timestamp: Date.now() });
+        }
+
+        function handleGameEvent(msg) {
+            if (!msg || !msg.type) return;
+
+                if (msg.timestamp >= lastResetTimestamp) {
+                    lastResetTimestamp = msg.timestamp;
+                    connectedPlayers.clear();
+                    activeRound = 0;
+                    roundStartTimestamp = null;
+                    if (currentCharacterKey) {
+                        broadcastJoin(currentCharacterKey);
+                    }
+                    applyStateUI();
+                    renderHostLobby();
+                return;
+            }
+
+
+            if (msg.type === "JOIN") {
+                if (!connectedPlayers.has(msg.char)) {
+                    connectedPlayers.add(msg.char);
+                    renderHostLobby();
+                }
+            } else if (msg.type === "START_ROUND") {
+                activeRound = msg.round;
+                roundStartTimestamp = msg.timestamp;
+                applyStateUI();
+            }
+        }
+
+        function applyStateUI() {
+            const preGameBox = document.getElementById('pre-game-box');
+            const activeGameBox = document.getElementById('active-game-box');
+            const pregameCountEl = document.getElementById('pregame-count');
+
+            if (pregameCountEl) pregameCountEl.innerText = connectedPlayers.size;
+
+            if (activeRound === 0) {
+                if (preGameBox) preGameBox.classList.remove('hidden');
+                if (activeGameBox) activeGameBox.classList.add('hidden');
+            } else {
+                if (activeGameBox) activeGameBox.classList.remove('hidden');
+
+                document.getElementById('global-story').innerHTML = globalStories[activeRound];
+                const char = characters[currentCharacterKey];
+                if (char && char.intel) {
+                    document.getElementById('char-round-info').innerText = char.intel[activeRound];
+                }
+
+                // REVELACIÓN DE LOS DOS ASESINOS EN LA RONDA 4
+                const killerReveal = document.getElementById('killer-reveal');
+
+                if (activeRound === 4 && isCulprit(currentCharacterKey)) {
+                    killerReveal.style.display = 'block';
+                    killerText.innerHTML = "⚠️ <b>¡TÚ ERES UNO DE LOS DOS ASESINOS COMPINCHADOS!</b><br><br>" +
+                        "Planificasteis el golpe al milímetro para libraros de las deudas y el chantaje de Blackwood: mientras uno abrió la puerta y forzó la cerradura de la caja fuerte usando la distracción de la música, el otro golpeó a Blackwood con el pisapapeles de mármol en pleno forcejeo. " +
+                        "¡Ahora debéis cubriros mutuamente las espaldas con disimulo, desviar sospechas hacia los demás y evitar que la mesa os descubra!";
+                } else if (activeRound === 4) {
+                    killerReveal.style.display = 'block';
+                    killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> En esta mesa hay <b>DOS asesinos compinchados</b> que se están cubriendo mutuamente. Revisa las pistas, contrasta coartadas y desenmascara a la pareja criminal para ganar la partida.";
+                } else {
+                    killerReveal.style.display = 'none';
+                }
+
+                updateClock();
+            }
+        }
+
+        function renderHostLobby() {
+            const count = connectedPlayers.size;
+            const pregameCountEl = document.getElementById('pregame-count');
+            if (pregameCountEl) pregameCountEl.innerText = count;
+
+            const btn = document.getElementById('btn-start-r1');
+            if (btn) {
+                if (count >= 10) {
+                    btn.disabled = false;
+                    btn.className = "btn-enabled";
+                    btn.innerText = "🚀 ¡Todos conectados (10/10)! INICIAR RONDA 1";
+                } else {
+                    btn.disabled = true;
+                    btn.className = "";
+                    btn.innerText = `⏳ Esperando a que todos entren (${count}/10)`;
+                }
+            }
+
+            const listEl = document.getElementById('host-player-list');
+            if (!listEl) return;
+            listEl.innerHTML = "";
+
+            Object.keys(characters).forEach(key => {
+                const real = playerNames[key];
+                const isConn = connectedPlayers.has(key);
+
+                const div = document.createElement("div");
+                div.className = "player-item";
+                if (isConn) {
+                    div.innerHTML = `<span><b>${real}</b></span><span class="badge badge-success">Listo</span>`;
+                } else {
+                    div.innerHTML = `<span style="color:#888;">${real}</span><span class="badge badge-waiting">Falta</span>`;
+                }
+                listEl.appendChild(div);
+            });
+        }
+
+        function updateClock() {
+            const clockElement = document.getElementById('timer-clock');
+            if (!clockElement || !roundStartTimestamp || activeRound === 0) return;
+
+            const elapsedSeconds = Math.floor((Date.now() - roundStartTimestamp) / 1000);
+            const totalDuration = 20 * 60;
+            const remaining = totalDuration - elapsedSeconds;
+
+            if (remaining <= 0) {
+                clockElement.innerText = "¡TIEMPO AGOTADO! Vota o avanza de ronda";
+                clockElement.style.color = "#ff4444";
+            } else {
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                const mStr = minutes < 10 ? "0" + minutes : minutes;
+                const sStr = seconds < 10 ? "0" + seconds : seconds;
+                clockElement.innerText = `${mStr}:${sStr}`;
+                clockElement.style.color = "#d4af37";
+            }
         }
     </script>
 </body>
