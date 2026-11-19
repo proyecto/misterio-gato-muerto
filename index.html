@@ -177,8 +177,18 @@
 
             <!-- CONTROLES DE RONDA Y CRONÓMETRO -->
             <div id="active-game-box" class="hidden">
-                <div id="host-round-controls" style="display:none; margin-top: 10px;">
-                    <p class="timer-info" style="color:#c5a059; margin-bottom: 5px;">👑 Control de Rondas (Rafael):</p>
+                <div id="host-round-controls" style="display:none; margin-top: 10px; background: #221b12; border: 1px solid #c5a059; border-radius: 6px; padding: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <span style="font-weight: bold; color: #d4af37; font-size: 14.5px;">👑 Control Maestro del Anfitrión (Rafael):</span>
+                        <span id="host-current-round-badge" class="badge" style="background:#c5a059; color:#121212; font-weight:bold;">Ronda 1</span>
+                    </div>
+
+                    <!-- BOTÓN MAESTRO DE SALTO INCONDICIONAL PARA TODOS -->
+                    <button id="btn-master-next-round" onclick="advanceNextRound()" class="btn-enabled" style="margin-top: 4px; margin-bottom: 12px; padding: 12px 15px; font-size: 15px; font-weight: bold; background: #27ae60; color: #fff; border: none; border-radius: 4px; box-shadow: 0 0 10px rgba(39, 174, 96, 0.4); width: 100%; cursor: pointer;">
+                        ⏩ Saltar a la siguiente ronda para todos (sin esperar votos)
+                    </button>
+
+                    <p style="font-size: 12px; color: #aaa; margin: 0 0 6px 0;">O forzar salto directo a cualquier punto:</p>
                     <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
                         <button onclick="triggerRound(0)" style="padding:8px 2px; font-size:12px; background:#443322; color:#f39c12; border:1px solid #f39c12;">⏸️ Espera</button>
                         <button onclick="triggerRound(1)" style="padding:8px 2px; font-size:12px; background:#333; color:#c5a059; border:1px solid #c5a059;">Ronda 1</button>
@@ -195,12 +205,6 @@
                         
                         <div id="host-voting-status" style="margin-top: 10px; padding: 8px 10px; background: #24162e; border: 1px solid #8e44ad; border-radius: 4px; font-size: 13px;">
                             🗳️ <b>Votos Ronda <span id="host-voting-round-num">1</span>:</b> <span id="host-voted-count" style="font-weight:bold; color:#bb86fc;">0</span> / <span id="host-total-voters">10</span> votos emitidos
-                            <div id="all-voted-alert" style="display:none; margin-top: 8px; color: #2ecc71; font-weight: bold;">
-                                🎉 ¡Todos los jugadores han votado en esta ronda!
-                                <button id="btn-next-round" onclick="advanceNextRound()" style="margin-top: 6px; padding: 8px; background: #27ae60; color: #fff; font-size: 13px; font-weight: bold;">
-                                    ⏩ Avanzar a Ronda Siguiente
-                                </button>
-                            </div>
                         </div>
 
                         <div id="host-player-list-active" class="player-grid" style="margin-top: 10px;"></div>
@@ -871,12 +875,35 @@
             const hostTotalVoters = document.getElementById('host-total-voters');
             if (hostTotalVoters) hostTotalVoters.innerText = Object.keys(characters).length;
 
-            const allVotedAlert = document.getElementById('all-voted-alert');
-            if (allVotedAlert) {
-                if (activeRound >= 1 && activeRound < 4 && votedCount >= 10) {
-                    allVotedAlert.style.display = 'block';
+            // Botón Maestro de salto de ronda para el anfitrión (SIEMPRE ACTIVO Y DISPONIBLE)
+            const masterNextBtn = document.getElementById('btn-master-next-round');
+            const hostBadge = document.getElementById('host-current-round-badge');
+            if (hostBadge) {
+                hostBadge.innerText = (activeRound === 0) ? "Sala de Espera" : `Ronda ${activeRound}`;
+            }
+
+            if (masterNextBtn) {
+                if (activeRound === 0) {
+                    masterNextBtn.style.display = 'block';
+                    masterNextBtn.innerText = `🚀 Iniciar Ronda 1 para todos (${count}/10 conectados)`;
+                    masterNextBtn.style.background = '#27ae60';
+                    masterNextBtn.onclick = () => triggerRound(1);
+                } else if (activeRound < 4) {
+                    masterNextBtn.style.display = 'block';
+                    masterNextBtn.onclick = () => advanceNextRound();
+                    const nextR = activeRound + 1;
+                    if (votedCount >= 10) {
+                        masterNextBtn.innerText = `🎉 ¡Todos han votado! ⏩ Saltar a Ronda ${nextR} para todos`;
+                        masterNextBtn.style.background = '#27ae60';
+                    } else {
+                        masterNextBtn.innerText = `⏩ Saltar a Ronda ${nextR} para todos (${votedCount}/10 votos emitidos)`;
+                        masterNextBtn.style.background = '#27ae60';
+                    }
                 } else {
-                    allVotedAlert.style.display = 'none';
+                    masterNextBtn.style.display = 'block';
+                    masterNextBtn.innerText = `⚖️ ¡Ronda Final 4 en curso! (Ver veredicto abajo)`;
+                    masterNextBtn.style.background = '#8e44ad';
+                    masterNextBtn.onclick = null;
                 }
             }
 
