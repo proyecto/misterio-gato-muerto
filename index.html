@@ -224,9 +224,6 @@
     </div>
 
     <script>
-        const GAME_TOPIC = "misterio_gato_tuerto_cabaret_partida_v3";
-        const NTFY_API = "https://ntfy.sh/" + GAME_TOPIC;
-
         const playerNames = {
             damian: "Rafael",
             vera: "Encarni",
@@ -391,14 +388,15 @@
             } catch (e) { return false; }
         }
 
+        const API_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1f3d2ffbc5e1c";
+
         let currentCharacterKey = localStorage.getItem("gato_char_key") || "";
         let connectedPlayers = new Set();
-        let lastResetTimestamp = 0;
         let activeRound = 0;
         let roundStartTimestamp = null;
+        let isSyncing = false;
 
         window.addEventListener("DOMContentLoaded", () => {
-            initSync();
             setInterval(updateClock, 1000);
 
             if (currentCharacterKey && characters[currentCharacterKey]) {
@@ -406,9 +404,12 @@
                 if (savedPass === passwords[currentCharacterKey]) {
                     connectedPlayers.add(currentCharacterKey);
                     showGameProfile();
-                    broadcastJoin(currentCharacterKey);
+                    syncWithServer();
                 }
             }
+
+            // Sincronización continua cada 3.5 segundos
+            setInterval(syncWithServer, 3500);
         });
 
         function login() {
@@ -428,9 +429,10 @@
             localStorage.setItem("gato_char_key", select);
             localStorage.setItem("gato_char_pass", pass);
 
+            // Se añade a sí mismo en local (GARANTIZADO: NUNCA se borrará)
             connectedPlayers.add(currentCharacterKey);
             showGameProfile();
-            broadcastJoin(currentCharacterKey);
+            syncWithServer();
         }
 
         function logout() {
@@ -460,90 +462,100 @@
             applyStateUI();
         }
 
-        function initSync() {
-            loadEventHistory();
+        // SINCRONIZACIÓN FIABLE CON EL ALMACÉN ONLINE
+        async function syncWithServer() {
+            if (!currentCharacterKey || isSyncing) return;
+            isSyncing = true;
 
             try {
-                const eventSource = new EventSource(`${NTFY_API}/sse`);
-                eventSource.onmessage = (e) => {
-                    try {
-                        const data = JSON.parse(e.data);
-                        if (data.event === "message" && data.message) {
-                            handleGameEvent(JSON.parse(data.message));
-                        }
-                    } catch (err) {}
-                };
-            } catch (err) {}
+                const res = await fetch(API_URL);
+                if (res.ok) {
+                    const json = await res.json();
+                    const sData = json.data || {};
 
-            setInterval(loadEventHistory, 3000);
-        }
-
-        async function loadEventHistory() {
-            try {
-                const response = await fetch(`${NTFY_API}/json?poll=1`);
-                if (!response.ok) return;
-                const text = await response.text();
-                const lines = text.trim().split("\n");
-                for (const line of lines) {
-                    if (!line) continue;
-                    try {
-                        const data = JSON.parse(line);
-                        if (data.event === "message" && data.message) {
-                            handleGameEvent(JSON.parse(data.message));
-                        }
-                    } catch (e) {}
-                }
-            } catch (err) {}
-        }
-
-        async function sendGameEvent(payload) {
-            try {
-                await fetch(NTFY_API, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {}
-        }
-
-        function broadcastJoin(charKey) {
-            sendGameEvent({ type: "JOIN", char: charKey, timestamp: Date.now() });
-        }
-
-        function triggerRound(roundNum) {
-            sendGameEvent({ type: "START_ROUND", round: roundNum, timestamp: Date.now() });
-        }
-
-        function resetGame() {
-            if (!confirm("¿Seguro que quieres reiniciar la partida a 0?")) return;
-            sendGameEvent({ type: "RESET", timestamp: Date.now() });
-        }
-
-        function handleGameEvent(msg) {
-            if (!msg || !msg.type) return;
-
-                if (msg.timestamp >= lastResetTimestamp) {
-                    lastResetTimestamp = msg.timestamp;
-                    connectedPlayers.clear();
-                    activeRound = 0;
-                    roundStartTimestamp = null;
-                    if (currentCharacterKey) {
-                        broadcastJoin(currentCharacterKey);
+                    // Combinar lista de conectados recibida
+                    if (Array.isArray(sData.connected)) {
+                        sData.connected.forEach(c => connectedPlayers.add(c));
                     }
+                    // Siempre asegurar que el jugador actual sigue dentro
+                    connectedPlayers.add(currentCharacterKey);
+
+                    // Si hay una ronda activa en el servidor
+                    if (typeof sData.round === 'number' && sData.round > 0) {
+                        activeRound = sData.round;
+                        roundStartTimestamp = sData.startTime;
+                    }
+
+                    renderHostLobby();
                     applyStateUI();
-                    renderHostLobby();
-                return;
-            }
 
-
-            if (msg.type === "JOIN") {
-                if (!connectedPlayers.has(msg.char)) {
-                    connectedPlayers.add(msg.char);
-                    renderHostLobby();
+                    // Si mi personaje no está aún guardado en el servidor, registrarlo con PATCH
+                    if (!sData.connected || !sData.connected.includes(currentCharacterKey)) {
+                        await fetch(API_URL, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                data: {
+                                    connected: Array.from(connectedPlayers),
+                                    round: activeRound,
+                                    startTime: roundStartTimestamp
+                                }
+                            })
+                        });
+                    }
                 }
-            } else if (msg.type === "START_ROUND") {
-                activeRound = msg.round;
-                roundStartTimestamp = msg.timestamp;
-                applyStateUI();
+            } catch (err) {
+                // En caso de fallo de red puntual, el estado local no se altera
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        async function triggerRound(roundNum) {
+            activeRound = roundNum;
+            roundStartTimestamp = Date.now();
+            applyStateUI();
+
+            try {
+                await fetch(API_URL, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        data: {
+                            connected: Array.from(connectedPlayers),
+                            round: activeRound,
+                            startTime: roundStartTimestamp
+                        }
+                    })
+                });
+            } catch (err) {
+                console.warn("Error al guardar ronda en el servidor:", err);
+            }
+        }
+
+        async function resetGame() {
+            if (!confirm("¿Seguro que quieres reiniciar la partida a 0?")) return;
+            activeRound = 0;
+            roundStartTimestamp = null;
+            connectedPlayers.clear();
+            connectedPlayers.add(currentCharacterKey);
+            applyStateUI();
+            renderHostLobby();
+
+            try {
+                await fetch(API_URL, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        data: {
+                            connected: [currentCharacterKey],
+                            round: 0,
+                            startTime: null
+                        }
+                    })
+                });
+            } catch (err) {
+                console.warn("Error al reiniciar servidor:", err);
             }
         }
 
