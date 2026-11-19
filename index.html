@@ -106,7 +106,6 @@
                     </div>
 
                 </div>
-            </div>
 
             <!-- FORMULARIO DE ACCESO -->
             <div style="margin-top: 20px;">
@@ -151,15 +150,12 @@
                     <p style="font-weight: bold; color: #d4af37; margin: 0 0 5px 0;">👑 Panel del Organizador (Rafael):</p>
                     <div id="host-player-list" class="player-grid"></div>
                     
-                    <button id="btn-start-r1" onclick="triggerRound(1)" disabled style="margin-top: 15px;">
-                        ⏳ Esperando a que todos entren (1/10)
+                    <button id="btn-start-r1" onclick="triggerRound(1)" class="btn-enabled" style="margin-top: 15px; background: #27ae60; color: #fff;">
+                        🚀 Iniciar Ronda 1 ahora (1/10 conectados)
                     </button>
-
-                    <div style="text-align: center; margin-top: 8px;">
-                        <a href="javascript:void(0)" onclick="triggerRound(1)" style="color:#888; font-size:12px; text-decoration:underline;">
-                            Forzar inicio de Ronda 1 ahora (sin esperar a los 10)
-                        </a>
-                    </div>
+                    <p style="text-align: center; margin: 8px 0 0 0; font-size: 13px; color: #aaa;">
+                        💡 Como anfitrión, puedes iniciar la partida en cualquier momento pulsando el botón verde.
+                    </p>
                 </div>
             </div>
 
@@ -392,8 +388,8 @@
 
         let currentCharacterKey = localStorage.getItem("gato_char_key") || "";
         let connectedPlayers = new Set();
-        let activeRound = 0;
-        let roundStartTimestamp = null;
+        let activeRound = parseInt(localStorage.getItem("gato_active_round") || "0", 10);
+        let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
         let isSyncing = false;
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -408,8 +404,8 @@
                 }
             }
 
-            // Sincronización continua cada 3.5 segundos
-            setInterval(syncWithServer, 3500);
+            // Sincronización continua cada 3 segundos
+            setInterval(syncWithServer, 3000);
         });
 
         function login() {
@@ -429,7 +425,6 @@
             localStorage.setItem("gato_char_key", select);
             localStorage.setItem("gato_char_pass", pass);
 
-            // Se añade a sí mismo en local (GARANTIZADO: NUNCA se borrará)
             connectedPlayers.add(currentCharacterKey);
             showGameProfile();
             syncWithServer();
@@ -462,6 +457,26 @@
             applyStateUI();
         }
 
+        async function saveServerState() {
+            try {
+                const payload = {
+                    name: "Cabaret El Gato Tuerto",
+                    data: {
+                        connected: Array.from(connectedPlayers),
+                        round: activeRound,
+                        startTime: roundStartTimestamp
+                    }
+                };
+                await fetch(API_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.warn("Error al guardar estado en el servidor:", err);
+            }
+        }
+
         // SINCRONIZACIÓN FIABLE CON EL ALMACÉN ONLINE
         async function syncWithServer() {
             if (!currentCharacterKey || isSyncing) return;
@@ -477,31 +492,36 @@
                     if (Array.isArray(sData.connected)) {
                         sData.connected.forEach(c => connectedPlayers.add(c));
                     }
-                    // Siempre asegurar que el jugador actual sigue dentro
                     connectedPlayers.add(currentCharacterKey);
 
-                    // Si hay una ronda activa en el servidor
-                    if (typeof sData.round === 'number' && sData.round > 0) {
-                        activeRound = sData.round;
-                        roundStartTimestamp = sData.startTime;
+                    const isHost = (currentCharacterKey === 'damian');
+
+                    if (isHost) {
+                        // El organizador tiene la máxima prioridad en el estado de rondas
+                        if (activeRound > (sData.round || 0)) {
+                            await saveServerState();
+                        } else if (typeof sData.round === 'number' && sData.round > activeRound) {
+                            activeRound = sData.round;
+                            roundStartTimestamp = sData.startTime;
+                            localStorage.setItem("gato_active_round", activeRound);
+                            localStorage.setItem("gato_round_start", roundStartTimestamp || "");
+                        }
+                    } else {
+                        // Los demás jugadores siempre adoptan la ronda dictada por el anfitrión
+                        if (typeof sData.round === 'number' && sData.round !== activeRound) {
+                            activeRound = sData.round;
+                            roundStartTimestamp = sData.startTime;
+                            localStorage.setItem("gato_active_round", activeRound);
+                            localStorage.setItem("gato_round_start", roundStartTimestamp || "");
+                        }
                     }
 
                     renderHostLobby();
                     applyStateUI();
 
-                    // Si mi personaje no está aún guardado en el servidor, registrarlo con PATCH
+                    // Si el personaje actual no estaba en la nube, registrarlo
                     if (!sData.connected || !sData.connected.includes(currentCharacterKey)) {
-                        await fetch(API_URL, {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                data: {
-                                    connected: Array.from(connectedPlayers),
-                                    round: activeRound,
-                                    startTime: roundStartTimestamp
-                                }
-                            })
-                        });
+                        await saveServerState();
                     }
                 }
             } catch (err) {
@@ -514,49 +534,23 @@
         async function triggerRound(roundNum) {
             activeRound = roundNum;
             roundStartTimestamp = Date.now();
+            localStorage.setItem("gato_active_round", activeRound);
+            localStorage.setItem("gato_round_start", roundStartTimestamp);
             applyStateUI();
-
-            try {
-                await fetch(API_URL, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        data: {
-                            connected: Array.from(connectedPlayers),
-                            round: activeRound,
-                            startTime: roundStartTimestamp
-                        }
-                    })
-                });
-            } catch (err) {
-                console.warn("Error al guardar ronda en el servidor:", err);
-            }
+            await saveServerState();
         }
 
         async function resetGame() {
-            if (!confirm("¿Seguro que quieres reiniciar la partida a 0?")) return;
+            if (!confirm("¿Seguro que quieres reiniciar la partida a 0 (Sala de Espera)?")) return;
             activeRound = 0;
             roundStartTimestamp = null;
+            localStorage.removeItem("gato_active_round");
+            localStorage.removeItem("gato_round_start");
             connectedPlayers.clear();
             connectedPlayers.add(currentCharacterKey);
             applyStateUI();
             renderHostLobby();
-
-            try {
-                await fetch(API_URL, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        data: {
-                            connected: [currentCharacterKey],
-                            round: 0,
-                            startTime: null
-                        }
-                    })
-                });
-            } catch (err) {
-                console.warn("Error al reiniciar servidor:", err);
-            }
+            await saveServerState();
         }
 
         function applyStateUI() {
@@ -570,27 +564,33 @@
                 if (preGameBox) preGameBox.classList.remove('hidden');
                 if (activeGameBox) activeGameBox.classList.add('hidden');
             } else {
+                if (preGameBox) preGameBox.classList.add('hidden');
                 if (activeGameBox) activeGameBox.classList.remove('hidden');
 
-                document.getElementById('global-story').innerHTML = globalStories[activeRound];
+                document.getElementById('global-story').innerHTML = globalStories[activeRound] || "";
                 const char = characters[currentCharacterKey];
                 if (char && char.intel) {
-                    document.getElementById('char-round-info').innerText = char.intel[activeRound];
+                    document.getElementById('char-round-info').innerText = char.intel[activeRound] || "";
                 }
 
                 // REVELACIÓN DEL ASESINO EN LA RONDA 4
                 const killerReveal = document.getElementById('killer-reveal');
+                const killerText = document.getElementById('killer-text');
 
                 if (activeRound === 4 && isCulprit(currentCharacterKey)) {
-                    killerReveal.style.display = 'block';
-                    killerText.innerHTML = "⚠️ <b>¡TÚ ERES EL ASESINO DE LORD BLACKWOOD!</b><br><br>" +
-                        "No tuviste otra salida: Blackwood iba a arruinarte la vida esta misma madrugada y a entregarte a la policía. Entraste a su despacho aprovechando el estruendo del Hot Jazz, forcejeasteis y le golpeaste en la cabeza con el pesado pisapapeles de mármol. " +
-                        "¡Tu coartada se tambalea! Desvía sospechas hacia los demás, utiliza tu frase obligatoria y defiéndete con uñas y dientes para evitar que la mesa te vote culpable.";
+                    if (killerReveal) killerReveal.style.display = 'block';
+                    if (killerText) {
+                        killerText.innerHTML = "⚠️ <b>¡TÚ ERES EL ASESINO DE LORD BLACKWOOD!</b><br><br>" +
+                            "No tuviste otra salida: Blackwood iba a arruinarte la vida esta misma madrugada y a entregarte a la policía. Entraste a su despacho aprovechando el estruendo del Hot Jazz, forcejeasteis y le golpeaste en la cabeza con el pesado pisapapeles de mármol. " +
+                            "¡Tu coartada se tambalea! Desvía sospechas hacia los demás, utiliza tu frase obligatoria y defiéndete con uñas y dientes para evitar que la mesa te vote culpable.";
+                    }
                 } else if (activeRound === 4) {
-                    killerReveal.style.display = 'block';
-                    killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> Entre vosotros hay <b>UN único culpable</b> que intenta camuflarse con coartadas falsas. Revisa las pistas, haz preguntas incómodas y votad al verdadero asesino para ganar la partida.";
+                    if (killerReveal) killerReveal.style.display = 'block';
+                    if (killerText) {
+                        killerText.innerHTML = "<span style='color:#2ecc71;'>¡Tú NO eres el asesino!</span> Entre vosotros hay <b>UN único culpable</b> que intenta camuflarse con coartadas falsas. Revisa las pistas, haz preguntas incómodas y votad al verdadero asesino para ganar la partida.";
+                    }
                 } else {
-                    killerReveal.style.display = 'none';
+                    if (killerReveal) killerReveal.style.display = 'none';
                 }
 
                 updateClock();
@@ -604,14 +604,12 @@
 
             const btn = document.getElementById('btn-start-r1');
             if (btn) {
+                btn.disabled = false;
+                btn.className = "btn-enabled";
                 if (count >= 10) {
-                    btn.disabled = false;
-                    btn.className = "btn-enabled";
-                    btn.innerText = "🚀 ¡Todos conectados (10/10)! INICIAR RONDA 1";
+                    btn.innerText = "🚀 ¡Todos conectados (10/10)! EMPEZAR PARTIDA";
                 } else {
-                    btn.disabled = true;
-                    btn.className = "";
-                    btn.innerText = `⏳ Esperando a que todos entren (${count}/10)`;
+                    btn.innerText = `🚀 Iniciar Ronda 1 ahora (${count}/10 conectados)`;
                 }
             }
 
