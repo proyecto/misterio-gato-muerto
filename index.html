@@ -45,6 +45,8 @@
         .vote-option-card input { width: auto; margin: 0; cursor: pointer; }
         .badge-voted { background: #8e44ad !important; color: #fff !important; font-size: 11px; }
         .badge-pending { background: #d35400 !important; color: #fff !important; font-size: 11px; }
+        .rank-tab-btn { padding: 4px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #4a3b56; background: #2c1e33; color: #bbb; cursor: pointer; transition: all 0.2s; }
+        .rank-tab-btn:hover { border-color: #9b59b6; color: #fff; }
     </style>
 </head>
 <body>
@@ -209,10 +211,24 @@
 
                         <div id="host-player-list-active" class="player-grid" style="margin-top: 10px;"></div>
 
-                        <!-- RECUENTO FINAL DE VOTACIÓN (SOLO EN RONDA 4) -->
-                        <div id="final-tally-box" style="display:none; margin-top: 12px; padding: 10px; background: #2d1515; border: 1px solid #e74c3c; border-radius: 4px;">
-                            <p style="margin: 0 0 6px 0; font-weight: bold; color: #ff6b6b;">⚖️ Veredicto Final de la Mesa (Quién votó a quién):</p>
-                            <div id="final-tally-list" style="font-size: 13px; line-height: 1.6;"></div>
+                        <!-- RANKING DE SOSPECHOSOS EN TIEMPO REAL PARA EL ORGANIZADOR (TODAS LAS RONDAS) -->
+                        <div id="host-ranking-box" style="display:none; margin-top: 14px; padding: 12px; background: #221426; border: 1px solid #9b59b6; border-radius: 6px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #4a2c5a; padding-bottom:6px;">
+                                <span style="font-weight: bold; color: #e0b0ff; font-size:13.5px;">
+                                    📊 Ranking de Sospechosos (<span id="ranking-round-label">Ronda 1</span>):
+                                </span>
+                                <span id="ranking-vote-tally" style="font-size:12px; color:#f1c40f; font-weight:bold;">0 votos</span>
+                            </div>
+                            
+                            <!-- Pestañas para consultar el historial de rondas -->
+                            <div id="ranking-round-selector" style="display:flex; gap:6px; margin-bottom:10px;">
+                                <button type="button" onclick="selectRankingRound(1)" class="rank-tab-btn" id="rank-tab-1">R1</button>
+                                <button type="button" onclick="selectRankingRound(2)" class="rank-tab-btn" id="rank-tab-2">R2</button>
+                                <button type="button" onclick="selectRankingRound(3)" class="rank-tab-btn" id="rank-tab-3">R3</button>
+                                <button type="button" onclick="selectRankingRound(4)" class="rank-tab-btn" id="rank-tab-4">R4 (Final)</button>
+                            </div>
+
+                            <div id="host-ranking-list" style="font-size: 13px; line-height: 1.5;"></div>
                         </div>
                     </details>
                 </div>
@@ -612,6 +628,12 @@
         let connectedTimestamps = {}; // { [charKey]: timestamp }
         let activeRound = parseInt(localStorage.getItem("gato_active_round") || "0", 10);
         let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
+        let viewingRankingRound = 0; // 0 significa seguir automáticamente a activeRound
+
+        function selectRankingRound(r) {
+            viewingRankingRound = r;
+            renderHostLobby();
+        }
         let currentVotes = {};
         try {
             const rawVotes = localStorage.getItem("gato_votes_data");
@@ -830,6 +852,7 @@
 
         async function triggerRound(roundNum) {
             activeRound = roundNum;
+            viewingRankingRound = roundNum;
             roundStartTimestamp = (roundNum === 0) ? null : Date.now();
             localStorage.setItem("gato_active_round", activeRound);
             if (roundStartTimestamp) {
@@ -851,7 +874,24 @@
 
         function advanceNextRound() {
             if (activeRound < 4) {
-                triggerRound(activeRound + 1);
+                const nextR = activeRound + 1;
+                const roundVotes = currentVotes[activeRound] || {};
+                const tally = {};
+                Object.values(roundVotes).forEach(s => { tally[s] = (tally[s] || 0) + 1; });
+                const sorted = Object.entries(tally).sort((a,b) => b[1] - a[1]);
+
+                let rankSummary = "";
+                if (sorted.length > 0) {
+                    rankSummary = "\n\n📊 Ranking de sospechosos de la Ronda " + activeRound + ":\n" +
+                        sorted.map(([s, n], i) => `  ${i+1}º ${playerNames[s] || s} (${characters[s]?.title || s}): ${n} ${n===1?'voto':'votos'}`).join("\n");
+                } else {
+                    rankSummary = "\n\n(Aviso: aún no se habían emitido votos en esta ronda)";
+                }
+
+                if (confirm(`¿Avanzar a la Ronda ${nextR} para todos los jugadores?` + rankSummary)) {
+                    viewingRankingRound = nextR;
+                    triggerRound(nextR);
+                }
             }
         }
 
@@ -988,30 +1028,78 @@
                 }
             }
 
-            // Recuento en Ronda 4 (Final)
-            const finalTallyBox = document.getElementById('final-tally-box');
-            const finalTallyList = document.getElementById('final-tally-list');
-            if (finalTallyBox && finalTallyList) {
-                if (activeRound === 4 && votedCount > 0) {
-                    finalTallyBox.style.display = 'block';
-                    const tally = {};
-                    Object.values(roundVotes).forEach(suspectKey => {
-                        tally[suspectKey] = (tally[suspectKey] || 0) + 1;
-                    });
-                    const sorted = Object.entries(tally).sort((a,b) => b[1] - a[1]);
-                    let tallyHtml = "<div style='display:flex; flex-direction:column; gap:6px;'>";
-                    sorted.forEach(([suspectKey, numVotes]) => {
-                        const name = playerNames[suspectKey] || suspectKey;
-                        const charTitle = characters[suspectKey] ? characters[suspectKey].title : suspectKey;
-                        tallyHtml += `<div style='display:flex; justify-content:space-between; align-items:center; background:#1c0e0e; padding:6px 10px; border-radius:4px;'>
-                            <span>👉 <b>${charTitle}</b> (${name})</span>
-                            <span style='color:#f1c40f; font-weight:bold;'>${numVotes} ${numVotes === 1 ? 'voto' : 'votos'}</span>
-                        </div>`;
-                    });
-                    tallyHtml += "</div>";
-                    finalTallyList.innerHTML = tallyHtml;
+            // Ranking de sospechosos para el anfitrión (en vivo en todas las rondas)
+            const rankBox = document.getElementById('host-ranking-box');
+            const rankLabel = document.getElementById('ranking-round-label');
+            const rankTally = document.getElementById('ranking-vote-tally');
+            const rankList = document.getElementById('host-ranking-list');
+
+            if (rankBox && rankList) {
+                if (activeRound >= 1) {
+                    rankBox.style.display = 'block';
+                    const targetRankRound = (viewingRankingRound >= 1 && viewingRankingRound <= 4) ? viewingRankingRound : activeRound;
+                    const targetVotes = (currentVotes[targetRankRound]) ? currentVotes[targetRankRound] : {};
+                    const targetVoterKeys = Object.keys(targetVotes);
+                    const targetVotedCount = targetVoterKeys.length;
+
+                    if (rankLabel) rankLabel.innerText = "Ronda " + targetRankRound;
+                    if (rankTally) rankTally.innerText = `${targetVotedCount}/10 votos`;
+
+                    // Actualizar estilos visuales de las pestañas R1..R4
+                    for (let r = 1; r <= 4; r++) {
+                        const tabBtn = document.getElementById('rank-tab-' + r);
+                        if (tabBtn) {
+                            if (r === targetRankRound) {
+                                tabBtn.style.background = '#9b59b6';
+                                tabBtn.style.color = '#fff';
+                                tabBtn.style.borderColor = '#e0b0ff';
+                                tabBtn.style.fontWeight = 'bold';
+                            } else {
+                                tabBtn.style.background = '#2c1e33';
+                                tabBtn.style.color = '#bbb';
+                                tabBtn.style.borderColor = '#4a3b56';
+                                tabBtn.style.fontWeight = 'normal';
+                            }
+                        }
+                    }
+
+                    if (targetVotedCount === 0) {
+                        rankList.innerHTML = `<p style="color:#aaa; font-style:italic; margin:6px 0; font-size:12.5px;">Aún no se han emitido votos en la Ronda ${targetRankRound}.</p>`;
+                    } else {
+                        const tally = {}; // { [suspectKey]: [voterKeys...] }
+                        Object.entries(targetVotes).forEach(([voterKey, suspectKey]) => {
+                            if (!tally[suspectKey]) tally[suspectKey] = [];
+                            tally[suspectKey].push(voterKey);
+                        });
+
+                        const sorted = Object.entries(tally).sort((a, b) => b[1].length - a[1].length);
+                        let tallyHtml = "<div style='display:flex; flex-direction:column; gap:6px;'>";
+                        const medals = ["🥇", "🥈", "🥉"];
+
+                        sorted.forEach(([suspectKey, voterKeys], idx) => {
+                            const numVotes = voterKeys.length;
+                            const suspectName = playerNames[suspectKey] || suspectKey;
+                            const charTitle = characters[suspectKey] ? characters[suspectKey].title : suspectKey;
+                            const medal = medals[idx] || `<b style="color:#888;">${idx + 1}º</b>`;
+                            const votersList = voterKeys.map(k => playerNames[k] || k).join(", ");
+
+                            tallyHtml += `
+                                <div style="display:flex; flex-direction:column; background:#180f1d; border:1px solid #3d2448; border-radius:5px; padding:7px 10px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span>${medal} <b>${charTitle}</b> (${suspectName})</span>
+                                        <span style="color:#f1c40f; font-weight:bold; font-size:14px;">${numVotes} ${numVotes === 1 ? 'voto' : 'votos'}</span>
+                                    </div>
+                                    <div style="font-size:11.5px; color:#b399c2; margin-top:3px;">
+                                        Votado por: <i>${votersList}</i>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        tallyHtml += "</div>";
+                        rankList.innerHTML = tallyHtml;
+                    }
                 } else {
-                    finalTallyBox.style.display = 'none';
+                    rankBox.style.display = 'none';
                 }
             }
 
