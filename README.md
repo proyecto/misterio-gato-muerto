@@ -65,3 +65,40 @@ Juego de rol en vivo y misterio ambientado en los bajos fondos de Nueva Orleans 
 10. **Ylva (Gabi):** En una esquina de la barra, revisando carpetas de cuentas y recibos bajo una lamparilla.
 
 *Nota para el organizador: Las contraseñas se entregan en mano en un papel. Nadie puede salir del cabaret hasta que se resuelva el misterio y se señale al culpable.*
+
+---
+
+## 💥 Manías y Roces Personales entre los Invitados (Piques de sobremesa)
+
+Para dar salsa y discusión durante la velada, cada personaje tiene rencillas del día a día con otros invitados:
+
+* **Damián (Rafael):**
+  * *Con Axel (Juan):* Le pagó 150$ por blindar el Buick y el coche le dejó tirado echando humo a los dos días. Lo llama 'manazas'.
+  * *Con Mateo (Nacho):* No soporta su sonrisita sobrado de galán ni su humo de puro.
+* **Vera (Encarni):**
+  * *Con Dafne (Nazaret):* Odia que vaya de dama fina y se burla de su bolso de fiesta.
+  * *Con Beatrice (Tania):* Le parece una estirada amargada y le gusta provocarla riéndose alto cerca de ella.
+* **Dafne (Nazaret):**
+  * *Con Beatrice (Tania):* Sabe que Beatrice sospecha del bolso que le vendió, pero la tacha de monja sin gusto para vestir.
+  * *Con Damián (Rafael):* Le revienta que llame chapuzas a su marido Axel; Damián no sabe conducir y revienta los embragues.
+* **Axel (Juan):**
+  * *Con Damián (Rafael):* Su Buick se rompió porque Damián conduce como un animal; que aprenda a pisar el embrague.
+  * *Con Thiago (Rafael amigo):* Thiago se queja del ruido de los motores, pero el cabaret tiene un cableado ruinoso que va a salir ardiendo.
+* **Dra. Beatrice (Tania):**
+  * *Con Dafne (Nazaret):* Le compró un bolso 'exclusivo de París' por una fortuna y en una fiesta descubrió que era una imitación barata de mercadillo; pasó una vergüenza espantosa.
+  * *Con Vera (Encarni):* La considera una ordinaria y ruidosa que no sabe comportarse.
+* **Silvana (Inés):**
+  * *Con Ylva (Gabi):* Le rechazó una factura de 15$ por pintar carteles tachándola de 'gasto inútil'. La ve como un robot tacaño.
+  * *Con Dafne (Nazaret):* No soporta su clasismo ni que juzgue a la gente por los trapos que lleva.
+* **Ylva (Gabi):**
+  * *Con Silvana (Inés):* Cree que es una caradura que quiere vivir del cuento y cobrar por cuatro manchas de pintura.
+  * *Con Mateo (Nacho):* Le llena los libros contables de ceniza de puro y sus cuentas nunca cuadran.
+* **Thiago (Rafael amigo):**
+  * *Con Mateo (Nacho):* Mateo le debe 60$ en copas y tabaco desde hace semanas y siempre le da largas.
+  * *Con Axel (Juan):* Los bólidos de Axel en el callejón hacen temblar la vajilla y asustan a los clientes del local.
+* **Julian (Javi):**
+  * *Con Damián (Rafael):* Odia que le trate como a un lacayo sirviente exigiéndole que le abra la puerta.
+  * *Con Mateo (Nacho):* Intentó colarle una caja de tabaco falso creyendo que era tonto.
+* **Mateo (Nacho):**
+  * *Con Thiago (Rafael amigo):* Dice que no le paga la cuenta porque Thiago sirve el ron aguado con hielo derretido.
+  * *Con Damián (Rafael):* Se cree el rey del mambo solo por tener los brazos grandes; le parece un matón sin neuronas.

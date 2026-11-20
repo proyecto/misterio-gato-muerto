@@ -259,8 +259,14 @@
             </div>
 
             <div class="card" style="border-left-color: #e056fd; background: #201526;">
-                <h4 style="color: #f368e0; margin-top:0;">💍 Tu Pareja Formal y Dinámica Conyugal</h4>
+                <h4 style="color: #f368e0; margin-top:0;">💍 Tu Pareja en el Juego y qué debes hacer con ella</h4>
                 <div id="char-pareja" style="line-height: 1.6; font-size: 15px;"></div>
+            </div>
+
+            <!-- RENCÍLLAS Y MANÍAS PERSONALES (PARA DAR JUEGO EN LA MESA) -->
+            <div class="card" style="border-left-color: #e67e22; background: #251b14;">
+                <h4 style="color: #f39c12; margin-top:0;">💥 Tus Manías y Roces Personales (Para picar a los demás en la mesa)</h4>
+                <div id="char-rencillas" style="line-height: 1.6; font-size: 14.5px; color: #f5d6b4;"></div>
             </div>
 
             <div class="card" style="border-left-color: #a93226;">
@@ -340,6 +346,7 @@
 
         const characters = {
             "damian": {
+            "rencillas": "• <b>Pique con Axel (Juan):</b> Le tienes una manía que no puedes con él. Hace dos semanas le pagaste 150 dólares por poner a punto y blindar el motor de tu coche Buick, y a los dos días te dejó tirado echando una humareda negra en mitad del barro cuando paseabas con Vera. Crees que es un chapuzas incompetente y cada vez que habla te gusta llamarle 'manazas' y decirle que no tiene ni idea de motores.<br><br>• <b>Pique con Mateo (Nacho):</b> No soportas su sonrisita de galán argentino ni sus aires de sobrado con los puros. Te parece un charlatán con demasiada labia y estás deseando que se pase de la raya para darle un guantazo.",
                         "title": "Damián 'El Santo' Valdés",
                         "subtitle": "El hombre de confianza de Blackwood / Organizador forzoso",
                         "fachada": "Eres un hombre corpulento, elegante pero peligroso, de los que imponen respeto con solo entrar a una sala. Siempre tienes una sonrisa y te gusta invitar a copas, pero todos en los bajos fondos saben la verdad: durante años has sido el matón, el cobrador y el hombre de máxima confianza de Lord Blackwood. Te encargabas de cobrar las deudas a la fuerza, amenazar a quien hiciera falta y quitar de en medio a cualquiera que molestara en sus negocios. Por eso, al aparecer Blackwood muerto con la cabeza reventada, eres tú quien atranca la puerta del cabaret y se pone al mando de la investigación: nadie se atreve a llevarte la contraria cuando te pones serio. Cuando se encontró el cadáver estaba: cerca de la puerta principal y el guardarropa vigilando el local, acudiendo el primero al pasillo al oír el grito de Thiago para confirmar la muerte y atrancar la puerta con cerrojo de hierro.",
@@ -354,6 +361,7 @@
                         }
             },
             "vera": {
+            "rencillas": "• <b>Pique con Dafne (Nazaret):</b> Te revienta que siempre vaya de dama refinada de alta cuna mirándote por encima del hombro. Siempre que puedes, le sueltas pullitas burlándote de sus poses o diciendo que se agarra a su bolso de fiesta como si guardara un tesoro de baratijas baratas.<br><br>• <b>Pique con la Dra. Beatrice (Tania):</b> La ves como una estirada amargada que mira a todo el mundo como si estuvieran locos. Te encanta chincharla bailando fuerte o riéndote a carcajadas cerca de su mesa.",
                         "title": "Vera 'La Huracán' de la Vega",
                         "subtitle": "La bailarina del cabaret / Amante del peligro",
                         "fachada": "Eres pura alegría, fiesta y energía. Nadie en Nueva Orleans baila como tú ni anima tanto las noches del cabaret. Te encantan los vestidos brillantes, las risas, el cotilleo y la emoción. Tu risa se oye por todo el local y siempre estás rodeada de gente. Tu marido es Damián, el tipo más temido de la ciudad, pero tú eres la única persona a la que él jamás levantaría la voz. Cuando se encontró el cadáver estaba: en el centro de la pista de baile con una copa de champán en la mano, charlando en voz alta y llamando la atención de todos.",
@@ -368,6 +376,7 @@
                         }
             },
             "silvana": {
+            "rencillas": "• <b>Pique con Ylva (Gabi):</b> Le tienes mucha tirria a la auditora: le presentaste una factura de apenas 15 dólares por unos carteles que pintaste a mano para el cabaret y te la rechazó tachándola de 'gasto inútil para la empresa'. Consideras que Ylva es un robot tacaño, fría como el hielo y sin una gota de gusto artístico.<br><br>• <b>Pique con Dafne (Nazaret):</b> No tragas su obsesión con el dinero y los vestidos caros; te parece una mujer superficial que juzga a las personas solo por la ropa que llevan.",
                         "title": "Silvana 'La Bohemia' Gaultier",
                         "subtitle": "La pintora del barrio / Heredera en secreto",
                         "fachada": "Vistes con ropa sencilla de artista, llevas un pañuelo al cuello y casi siempre tienes alguna mancha de pintura o carboncillo en los dedos. Te muestras humilde, tímida y aseguras que apenas ganas para pagar el alquiler de tu buhardilla y comprar lienzos. Todos te ven como una chica bohemia e inofensiva que solo piensa en el arte. Cuando se encontró el cadáver estaba: en una mesa lateral del salón, con su cuaderno de bocetos y carboncillo en las manos, dibujando a los músicos.",
@@ -382,6 +391,7 @@
                         }
             },
             "mateo": {
+            "rencillas": "• <b>Pique con Thiago (Rafael amigo):</b> Te niegas a pagarle los 60 dólares que le debes de copas y tabaco en la barra porque dices que Thiago sirve el ron aguado con hielo derretido y que cobra las copas a precio de oro como si fuera un hotel de lujo.<br><br>• <b>Pique con Damián (Rafael):</b> No soportas que vaya de jefe del local solo por tener los brazos grandes y meter miedo. Te gusta chincharle con sonrisitas burlonas para demostrarle que no le tienes ningún miedo.",
                         "title": "Mateo 'El Porteño' Rossi",
                         "subtitle": "El contrabandista con labia / ¡ERES EL ASESINO REAL!",
                         "fachada": "Tienes pinta de galán, mucha labia, simpatía y don de gentes. Vistes con chaleco impecable, siempre tienes una sonrisa pícara y fumas puros habanos de contrabando. Dices que te ganas la vida vendiendo tabaco y licores finos, y le caes bien a todo el mundo. Tu novia oficial es Silvana, a quien tratas con ternura para dar imagen de buen tipo. Cuando se encontró el cadáver estaba: apoyado en la barra del bar, encendiendo con parsimonia una cerilla para su puro habano, con las mangas de la camisa subidas.",
@@ -396,6 +406,7 @@
                         }
             },
             "dafne": {
+            "rencillas": "• <b>Pique con la Dra. Beatrice (Tania):</b> Sabes de sobra que Beatrice sospecha del bolso 'de París' que le vendiste hace semanas, pero te parece una estirada soberbia y sin estilo que viste como salida de un convento. Cada vez que opina de moda, le dejas caer que el buen gusto no se aprende en los libros de medicina.<br><br>• <b>Pique con Damián (Rafael):</b> Cada vez que Damián insulta a tu marido Axel llamándolo 'manazas' por lo de su coche, te hierve la sangre. Consideras a Damián un bruto ignorante que revienta los motores porque conduce a patadas.",
                         "title": "Dafne 'La Sirena' Mourlot",
                         "subtitle": "Experta en joyas y vestidos caros / Ladrona de imitaciones",
                         "fachada": "Eres una mujer deslumbrante, elegante y muy segura de ti misma. Te apasionan los vestidos de fiesta, los collares brillantes y los bolsos exclusivos. Pareces una dama de la alta sociedad que aconseja a las mujeres ricas sobre qué joyas y modelos comprar. Nadie duda de tu buen gusto ni de tu clase. Cuando se encontró el cadáver estaba: en los sillones del reservado VIP, arreglándose el broche del vestido y sujetando su bolso de mano bien cerrado en el regazo.",
@@ -410,6 +421,7 @@
                         }
             },
             "axel": {
+            "rencillas": "• <b>Pique con Damián (Rafael):</b> Estás harto de que Damián te eche la culpa de la avería de su Buick. El coche se averió porque Damián no sabe cambiar de marcha, mete los cambios a lo bestia y revienta el embrague. Si te insinúa que eres mal mecánico, dile que aprenda a conducir antes de quejarse.<br><br>• <b>Pique con Thiago (Rafael amigo):</b> Thiago siempre te protesta diciendo que tus motores en el callejón hacen ruido y sobrecargan la luz. Recuérdale que el cableado del cabaret es una ruina vieja y que cualquier día sale ardiendo el local por su culpa.",
                         "title": "Axel 'El Tuercas' Vane",
                         "subtitle": "Mecánico de coches de carreras / Hombre de pocas palabras",
                         "fachada": "Eres un tipo serio, fuerte, de pocas palabras y mirada directa. Llevas tirantes oscuros y siempre hueles un poco a gasolina o grasa de taller. Eres el mejor mecánico de la ciudad: trucas motores para carreras clandestinas y para los coches que transportan alcohol ilegal a toda velocidad. No te gusta la cháchara inútil. Cuando se encontró el cadáver estaba: entrando por la puerta trasera del callejón con un trapo de taller en las manos manchadas de grasa.",
@@ -424,6 +436,7 @@
                         }
             },
             "beatrice": {
+            "rencillas": "• <b>Pique con Dafne (Nazaret):</b> ¡Le tienes un odio que no disimulas! Hace un mes le compraste a Dafne un bolso exclusivo 'supuestamente traído de París' por una fortuna, y en una merienda con señoras de la alta sociedad te señalaron con risitas que las costuras eran de una imitación barata de mercadillo. Pasaste una vergüenza tremenda y no soportas su pose de mujer elegante.<br><br>• <b>Pique con Vera (Encarni):</b> Consideras a Vera una mujer escandalosa, ruidosa y ordinaria, incapaz de mantener la compostura ni cinco minutos.",
                         "title": "Dra. Beatrice 'La Cirujana' Sola",
                         "subtitle": "Médica y psiquiatra del hospital / Mente analítica",
                         "fachada": "Eres una mujer inteligente, educada, seria y muy observadora. Trabajas como médica y psiquiatra en el hospital de la ciudad. Hablas con tranquilidad, no te dejas llevar por los nervios y analizas el comportamiento de todos como si fueran tus pacientes. Acabas de ser madre de un bebé y pareces una persona intachable. Cuando se encontró el cadáver estaba: en una mesa tranquila del fondo, vigilando la cuna portátil de su bebé mientras apuntaba notas en su libreta médica.",
@@ -438,6 +451,7 @@
                         }
             },
             "julian": {
+            "rencillas": "• <b>Pique con Damián (Rafael):</b> Aparte del miedo lógico a que descubra tu aventura con Vera, no tragas la soberbia de Damián: siempre te mira por encima del hombro como si fueras un simple chófer de segunda y te exige que le abras la puerta del coche con desprecio.<br><br>• <b>Pique con Mateo (Nacho):</b> Mateo intentó colarte una caja de tabaco falsificado hace días tratándote de tonto. No te fías de él ni un pelo.",
                         "title": "Julian 'El Sombra' Croft",
                         "subtitle": "Chófer de familias ricas / El marido infiel",
                         "fachada": "Vistes con traje oscuro y guantes blancos de chófer de lujo. Eres educado, reservado, hablas en voz baja y te mueves sin hacer ruido. Trabajas conduciendo los coches señoriales de las familias más ricas de la ciudad. Pareces un empleado leal y discreto que solo se preocupa por cumplir su horario. Cuando se encontró el cadáver estaba: cerca de la salida del callejón y el guardarropa, ajustándose los guantes blancos de chófer con gesto tenso.",
@@ -452,6 +466,7 @@
                         }
             },
             "ylva": {
+            "rencillas": "• <b>Pique con Silvana (Inés):</b> Te parece una bohemia caradura que pretende que el cabaret le pague caprichos por cuatro manchas de pintura en una cartulina. Cada vez que habla de arte, le recuerdas que los negocios se mantienen con dinero contante y sonante, no con cuadros.<br><br>• <b>Pique con Mateo (Nacho):</b> No soportas que fume sus puros cerca de tus libros contables y te llene las hojas de ceniza. Además, sabes que sus cuentas de tabaco no cuadran con la realidad.",
                         "title": "Ylva 'La Nórdica' Lindqvist",
                         "subtitle": "Auditora de cuentas / La extranjera que se hace la despistada",
                         "fachada": "Eres una chica del norte de Europa, rubia, seria y con una carpeta llena de números y balances bajo el brazo. Te han enviado a revisar las cuentas del cabaret. Hablas con un acento extranjero gracioso y a veces finges que no entiendes bien las palabras difíciles en español para que los demás se confíen y hablen de más delante de ti. Pero en realidad eres listísima y los números no te engañan jamás. Cuando se encontró el cadáver estaba: en una esquina de la barra, revisando carpetas de cuentas y recibos bajo una lamparilla de mesa.",
@@ -466,6 +481,7 @@
                         }
             },
             "thiago": {
+            "rencillas": "• <b>Pique con Mateo (Nacho):</b> Mateo te debe más de 60 dólares en copas y tabaco en la barra desde hace dos semanas, dándote largas con que 'ya te pagará cuando cierre un negocio'. Estás harto de sus promesas y de que encima critique tus copas.<br><br>• <b>Pique con Axel (Juan):</b> Cada vez que Axel arranca sus bólidos en el callejón, retumban las paredes del local, vibra la cristalería y las lámparas parpadean. Le has avisado mil veces de que molesta a los clientes VIP con ese humo.",
                         "title": "Thiago 'El Carioca' Da Silva",
                         "subtitle": "Jefe de sala del cabaret / Ojos y oídos de la noche",
                         "fachada": "Eres el encargado del cabaret: simpático, encantador, siempre bien vestido con chaleco y un clavel rojo en la solapa. Recibes a los clientes importantes, sirves el mejor champán y te aseguras de que la música no pare. Pareces el amigo de todos y siempre tienes una sonrisa en la boca, pero conoces todos los rincones, llaves y secretos de lo que pasa en este local. Cuando se encontró el cadáver estaba: en el pasillo interior junto a la puerta del despacho de Blackwood, en shock y con la copa de oporto rota en el suelo tras haber descubierto el cuerpo.",
@@ -805,6 +821,8 @@
             document.getElementById('char-subtitle').innerText = `${char.subtitle} | Jugador: ${playerNames[currentCharacterKey]}`;
             document.getElementById('char-fachada').innerText = char.fachada;
             document.getElementById('char-pareja').innerHTML = char.pareja || '';
+            const rencillasEl = document.getElementById('char-rencillas');
+            if (rencillasEl) rencillasEl.innerHTML = char.rencillas || '';
             document.getElementById('char-secreto').innerText = char.secreto;
             document.getElementById('char-frase').innerText = char.frase;
 
