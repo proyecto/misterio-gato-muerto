@@ -12,9 +12,9 @@ Juego de rol en vivo y misterio ambientado en los bajos fondos de Nueva Orleans 
 
 1. **Pareja 1 (¡Adulterio y Traición!):**
    * **Rafael** - Damián 'El Santo' Valdés - `toreo20`  
-     *Atrezo:* Corbata elegante o pajarita torcida. *(Marido leal que confía en Vera... sin saber que ella le engaña).*
+     *Atrezo:* Corbata elegante o pajarita torcida, puños remangados o nudillos curtidos. *(Histórico matón y hombre de máxima confianza de Lord Blackwood: hacía sus encargos sucios de extorsión y liquidación de enemigos. Tras el asesinato, atranca el local y asume la investigación por la fuerza con su autoridad de hierro. Con su mujer Vera es cariñoso y complaciente... sin sospechar que ella le engaña).*
    * **Encarni** - Vera 'La Huracán' de la Vega - `foxtrot1`  
-     *Atrezo:* Collar de perlas largo o pluma de charlestón. *(¡Infiel! Sale en secreto con Julian. Quiere culpar a Damián o a Beatrice).*
+     *Atrezo:* Collar de perlas largo o pluma de charlestón. *(¡Infiel! Sale en secreto con Julian. Teme el pasado violento de su marido y quiere culpar a Damián o a Beatrice).*
 
 2. **Pareja 2 (¡Adulterio y Frialdad!):**
    * **Javi** - Julian 'El Sombra' Croft - `soga77`  
