@@ -620,12 +620,13 @@
             } catch (e) { return false; }
         }
 
-        const NTFY_TOPIC = "cabaret_el_gato_tuerto_2026_room";
-        const localBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel("cabaret_gato_channel") : null;
+        const NTFY_TOPIC = "cabaret_el_gato_tuerto_v2_clean";
+        const localBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel("cabaret_gato_channel_v2") : null;
 
         // Sesión aislada por pestaña usando sessionStorage (permite abrir varias pestañas en el mismo PC)
         let currentCharacterKey = sessionStorage.getItem("gato_char_key") || "";
         let connectedTimestamps = {}; // { [charKey]: timestamp }
+        let lastResetTimestamp = parseInt(localStorage.getItem("gato_reset_timestamp") || "0", 10);
         let activeRound = parseInt(localStorage.getItem("gato_active_round") || "0", 10);
         let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
         let viewingRankingRound = 0; // 0 significa seguir automáticamente a activeRound
@@ -652,7 +653,7 @@
 
         function broadcastGameMessage(msg) {
             msg.sender = currentCharacterKey;
-            msg.timestamp = Date.now();
+            msg.timestamp = msg.timestamp || Date.now();
 
             // 1. Sincronización instantánea entre pestañas del mismo dispositivo
             try {
@@ -674,12 +675,44 @@
         function handleGameMessage(msg) {
             if (!msg || typeof msg !== 'object') return;
 
-            // Registro de presencia / actividad
+            // 1. MANEJO DE REINICIO GLOBAL A SALA DE ESPERA (RONDA 0)
+            if (msg.type === "RESET_GAME") {
+                const rTime = msg.resetTimestamp || msg.timestamp || Date.now();
+                if (rTime >= lastResetTimestamp) {
+                    lastResetTimestamp = rTime;
+                    localStorage.setItem("gato_reset_timestamp", String(lastResetTimestamp));
+                    activeRound = 0;
+                    viewingRankingRound = 0;
+                    roundStartTimestamp = null;
+                    currentVotes = {};
+
+                    localStorage.setItem("gato_active_round", "0");
+                    localStorage.removeItem("gato_round_start");
+                    localStorage.removeItem("gato_votes_data");
+                    for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
+
+                    if (msg.sender) {
+                        connectedTimestamps[msg.sender] = msg.timestamp || Date.now();
+                    }
+
+                    applyStateUI();
+                    renderHostLobby();
+                    renderVotingBox();
+                    return;
+                }
+            }
+
+            // 2. DESCARTAR CUALQUIER MENSAJE DE PARTIDAS ANTERIORES AL ÚLTIMO REINICIO
+            if (msg.timestamp && msg.timestamp < lastResetTimestamp) {
+                return;
+            }
+
+            // 3. REGISTRO DE PRESENCIA / ACTIVIDAD
             if (msg.sender) {
                 connectedTimestamps[msg.sender] = msg.timestamp || Date.now();
             }
 
-            // Sincronización de votos globales
+            // 4. SINCRONIZACIÓN DE VOTOS
             if (msg.votes && typeof msg.votes === 'object') {
                 Object.keys(msg.votes).forEach(r => {
                     if (!currentVotes[r]) currentVotes[r] = {};
@@ -694,29 +727,33 @@
                 renderVotingBox();
             }
 
-            // Sincronización de rondas
-            if (typeof msg.round === 'number') {
-                const isHost = (currentCharacterKey === 'damian');
-                if (!isHost || msg.type === "ROUND_CHANGE" || msg.type === "RESET_GAME") {
-                    if (msg.round !== activeRound) {
-                        activeRound = msg.round;
-                        roundStartTimestamp = msg.startTime || null;
-                        localStorage.setItem("gato_active_round", activeRound);
-                        if (roundStartTimestamp) {
-                            localStorage.setItem("gato_round_start", roundStartTimestamp);
-                        } else {
-                            localStorage.removeItem("gato_round_start");
+            // 5. CAMBIO DE RONDA (SOLO dictado por el anfitrión 'damian')
+            if (msg.type === "ROUND_CHANGE" || msg.type === "STATE_SYNC") {
+                if (typeof msg.round === 'number') {
+                    const isHost = (currentCharacterKey === 'damian');
+                    if (!isHost || msg.sender === 'damian') {
+                        if (msg.round !== activeRound) {
+                            activeRound = msg.round;
+                            viewingRankingRound = activeRound;
+                            roundStartTimestamp = msg.startTime || null;
+                            localStorage.setItem("gato_active_round", activeRound);
+                            if (roundStartTimestamp) {
+                                localStorage.setItem("gato_round_start", roundStartTimestamp);
+                            } else {
+                                localStorage.removeItem("gato_round_start");
+                            }
+                            applyStateUI();
+                            renderVotingBox();
                         }
-                        applyStateUI();
-                        renderVotingBox();
                     }
                 }
             }
 
-            // Si un jugador acaba de entrar (HELLO) y nosotros somos el Anfitrión (Rafael/Damián), respondemos con el estado completo
+            // 6. SI UN JUGADOR ENTRA (HELLO) Y SOMOS EL ANFITRIÓN, RESPONDEMOS CON EL ESTADO COMPLETO
             if (msg.type === "HELLO" && currentCharacterKey === 'damian' && msg.sender !== 'damian') {
                 broadcastGameMessage({
                     type: "STATE_SYNC",
+                    resetTimestamp: lastResetTimestamp,
                     round: activeRound,
                     startTime: roundStartTimestamp,
                     votes: currentVotes
@@ -771,9 +808,7 @@
                     connectedTimestamps[currentCharacterKey] = Date.now();
                     showGameProfile();
                     broadcastGameMessage({
-                        type: "HELLO",
-                        round: activeRound,
-                        startTime: roundStartTimestamp
+                        type: "HELLO"
                     });
                 }
             }
@@ -783,9 +818,7 @@
                 if (currentCharacterKey) {
                     connectedTimestamps[currentCharacterKey] = Date.now();
                     broadcastGameMessage({
-                        type: "HEARTBEAT",
-                        round: activeRound,
-                        startTime: roundStartTimestamp
+                        type: "HEARTBEAT"
                     });
                 }
                 renderHostLobby();
@@ -814,9 +847,7 @@
 
             // Saludar al resto de jugadores y solicitar estado
             broadcastGameMessage({
-                type: "HELLO",
-                round: activeRound,
-                startTime: roundStartTimestamp
+                type: "HELLO"
             });
         }
 
@@ -896,25 +927,34 @@
         }
 
         async function resetGame() {
-            if (!confirm("¿Seguro que quieres reiniciar la partida a 0 (Sala de Espera)?")) return;
+            if (!confirm("¿Seguro que quieres reiniciar la partida a 0 (Sala de Espera) para TODOS los jugadores? Se borrarán todos los votos de todas las rondas.")) return;
+            const now = Date.now();
+            lastResetTimestamp = now;
             activeRound = 0;
+            viewingRankingRound = 0;
             roundStartTimestamp = null;
             currentVotes = {};
-            localStorage.removeItem("gato_active_round");
+
+            localStorage.setItem("gato_reset_timestamp", String(now));
+            localStorage.setItem("gato_active_round", "0");
             localStorage.removeItem("gato_round_start");
             localStorage.removeItem("gato_votes_data");
             for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
+
             connectedTimestamps = {};
             connectedTimestamps[currentCharacterKey] = Date.now();
+
             applyStateUI();
             renderHostLobby();
             renderVotingBox();
 
             broadcastGameMessage({
                 type: "RESET_GAME",
+                resetTimestamp: now,
                 round: 0,
                 startTime: null,
-                votes: {}
+                votes: {},
+                timestamp: now
             });
         }
 
@@ -1216,6 +1256,10 @@
         }
 
         function submitVote() {
+            if (activeRound === 0) {
+                alert("La partida aún no ha comenzado (estamos en Sala de Espera).");
+                return;
+            }
             const selected = document.querySelector('input[name="suspect-choice"]:checked');
             if (!selected) {
                 alert("Por favor, selecciona a uno de los sospechosos de la lista antes de confirmar tu voto.");
