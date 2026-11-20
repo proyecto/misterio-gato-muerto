@@ -604,33 +604,170 @@
             } catch (e) { return false; }
         }
 
-        const API_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1f3d2ffbc5e1c";
+        const NTFY_TOPIC = "cabaret_el_gato_tuerto_2026_room";
+        const localBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel("cabaret_gato_channel") : null;
 
-        let currentCharacterKey = localStorage.getItem("gato_char_key") || "";
-        let connectedPlayers = new Set();
+        // Sesión aislada por pestaña usando sessionStorage (permite abrir varias pestañas en el mismo PC)
+        let currentCharacterKey = sessionStorage.getItem("gato_char_key") || "";
+        let connectedTimestamps = {}; // { [charKey]: timestamp }
         let activeRound = parseInt(localStorage.getItem("gato_active_round") || "0", 10);
         let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
-        let isSyncing = false;
         let currentVotes = {};
         try {
             const rawVotes = localStorage.getItem("gato_votes_data");
             if (rawVotes) currentVotes = JSON.parse(rawVotes);
         } catch (e) { currentVotes = {}; }
 
-        window.addEventListener("DOMContentLoaded", () => {
-            setInterval(updateClock, 1000);
+        function isPlayerConnected(key) {
+            if (key === currentCharacterKey) return true;
+            const lastSeen = connectedTimestamps[key] || 0;
+            return (Date.now() - lastSeen < 25000);
+        }
 
-            if (currentCharacterKey && characters[currentCharacterKey]) {
-                const savedPass = localStorage.getItem("gato_char_pass");
-                if (savedPass === passwords[currentCharacterKey]) {
-                    connectedPlayers.add(currentCharacterKey);
-                    showGameProfile();
-                    syncWithServer();
+        function getConnectedCount() {
+            return Object.keys(characters).filter(isPlayerConnected).length;
+        }
+
+        function broadcastGameMessage(msg) {
+            msg.sender = currentCharacterKey;
+            msg.timestamp = Date.now();
+
+            // 1. Sincronización instantánea entre pestañas del mismo dispositivo
+            try {
+                if (localBroadcastChannel) {
+                    localBroadcastChannel.postMessage(msg);
+                }
+            } catch (e) {}
+
+            // 2. Sincronización remota en tiempo real mediante ntfy.sh (sin límites diarios)
+            try {
+                fetch("https://ntfy.sh/" + NTFY_TOPIC, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(msg)
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
+        function handleGameMessage(msg) {
+            if (!msg || typeof msg !== 'object') return;
+
+            // Registro de presencia / actividad
+            if (msg.sender) {
+                connectedTimestamps[msg.sender] = msg.timestamp || Date.now();
+            }
+
+            // Sincronización de votos globales
+            if (msg.votes && typeof msg.votes === 'object') {
+                Object.keys(msg.votes).forEach(r => {
+                    if (!currentVotes[r]) currentVotes[r] = {};
+                    Object.assign(currentVotes[r], msg.votes[r]);
+                });
+                localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
+            }
+            if (msg.type === "VOTE_CAST" && msg.round && msg.voter && msg.suspect) {
+                if (!currentVotes[msg.round]) currentVotes[msg.round] = {};
+                currentVotes[msg.round][msg.voter] = msg.suspect;
+                localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
+                renderVotingBox();
+            }
+
+            // Sincronización de rondas
+            if (typeof msg.round === 'number') {
+                const isHost = (currentCharacterKey === 'damian');
+                if (!isHost || msg.type === "ROUND_CHANGE" || msg.type === "RESET_GAME") {
+                    if (msg.round !== activeRound) {
+                        activeRound = msg.round;
+                        roundStartTimestamp = msg.startTime || null;
+                        localStorage.setItem("gato_active_round", activeRound);
+                        if (roundStartTimestamp) {
+                            localStorage.setItem("gato_round_start", roundStartTimestamp);
+                        } else {
+                            localStorage.removeItem("gato_round_start");
+                        }
+                        applyStateUI();
+                        renderVotingBox();
+                    }
                 }
             }
 
-            // Sincronización continua cada 3 segundos
-            setInterval(syncWithServer, 3000);
+            // Si un jugador acaba de entrar (HELLO) y nosotros somos el Anfitrión (Rafael/Damián), respondemos con el estado completo
+            if (msg.type === "HELLO" && currentCharacterKey === 'damian' && msg.sender !== 'damian') {
+                broadcastGameMessage({
+                    type: "STATE_SYNC",
+                    round: activeRound,
+                    startTime: roundStartTimestamp,
+                    votes: currentVotes
+                });
+            }
+
+            renderHostLobby();
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            setInterval(updateClock, 1000);
+
+            // Escuchador local de pestañas
+            if (localBroadcastChannel) {
+                localBroadcastChannel.onmessage = (event) => {
+                    handleGameMessage(event.data);
+                };
+            }
+
+            // Conexión Server-Sent Events (SSE) en tiempo real con ntfy.sh
+            try {
+                const es = new EventSource("https://ntfy.sh/" + NTFY_TOPIC + "/sse");
+                es.onmessage = (event) => {
+                    try {
+                        const parsed = JSON.parse(event.data);
+                        if (parsed.event === "message" && parsed.message) {
+                            handleGameMessage(JSON.parse(parsed.message));
+                        }
+                    } catch (e) {}
+                };
+            } catch (e) {}
+
+            // Recuperar mensajes recientes de ntfy.sh para reconstruir el estado actual
+            fetch("https://ntfy.sh/" + NTFY_TOPIC + "/json?poll=1&since=all")
+                .then(res => res.text())
+                .then(text => {
+                    const lines = text.trim().split("\n").filter(Boolean);
+                    lines.forEach(line => {
+                        try {
+                            const parsed = JSON.parse(line);
+                            if (parsed.event === "message" && parsed.message) {
+                                handleGameMessage(JSON.parse(parsed.message));
+                            }
+                        } catch (e) {}
+                    });
+                }).catch(() => {});
+
+            // Auto-login si la pestaña ya tenía sesión activa
+            if (currentCharacterKey && characters[currentCharacterKey]) {
+                const savedPass = sessionStorage.getItem("gato_char_pass");
+                if (savedPass === passwords[currentCharacterKey]) {
+                    connectedTimestamps[currentCharacterKey] = Date.now();
+                    showGameProfile();
+                    broadcastGameMessage({
+                        type: "HELLO",
+                        round: activeRound,
+                        startTime: roundStartTimestamp
+                    });
+                }
+            }
+
+            // Heartbeat periódico (cada 4 segundos) para mantener presencia en vivo
+            setInterval(() => {
+                if (currentCharacterKey) {
+                    connectedTimestamps[currentCharacterKey] = Date.now();
+                    broadcastGameMessage({
+                        type: "HEARTBEAT",
+                        round: activeRound,
+                        startTime: roundStartTimestamp
+                    });
+                }
+                renderHostLobby();
+            }, 4000);
         });
 
         function login() {
@@ -647,15 +784,23 @@
             }
 
             currentCharacterKey = select;
-            localStorage.setItem("gato_char_key", select);
-            localStorage.setItem("gato_char_pass", pass);
+            sessionStorage.setItem("gato_char_key", select);
+            sessionStorage.setItem("gato_char_pass", pass);
 
-            connectedPlayers.add(currentCharacterKey);
+            connectedTimestamps[currentCharacterKey] = Date.now();
             showGameProfile();
-            syncWithServer();
+
+            // Saludar al resto de jugadores y solicitar estado
+            broadcastGameMessage({
+                type: "HELLO",
+                round: activeRound,
+                startTime: roundStartTimestamp
+            });
         }
 
         function logout() {
+            sessionStorage.removeItem("gato_char_key");
+            sessionStorage.removeItem("gato_char_pass");
             localStorage.removeItem("gato_char_key");
             localStorage.removeItem("gato_char_pass");
             location.reload();
@@ -683,98 +828,6 @@
             applyStateUI();
         }
 
-        async function saveServerState() {
-            try {
-                const payload = {
-                    name: "Cabaret El Gato Tuerto",
-                    data: {
-                        connected: Array.from(connectedPlayers),
-                        round: activeRound,
-                        startTime: roundStartTimestamp,
-                        votes: currentVotes
-                    }
-                };
-                await fetch(API_URL, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {
-                console.warn("Error al guardar estado en el servidor:", err);
-            }
-        }
-
-        // SINCRONIZACIÓN FIABLE CON EL ALMACÉN ONLINE
-        async function syncWithServer() {
-            if (!currentCharacterKey || isSyncing) return;
-            isSyncing = true;
-
-            try {
-                const res = await fetch(API_URL);
-                if (res.ok) {
-                    const json = await res.json();
-                    const sData = json.data || {};
-
-                    // Combinar lista de conectados recibida
-                    if (Array.isArray(sData.connected)) {
-                        sData.connected.forEach(c => connectedPlayers.add(c));
-                    }
-                    connectedPlayers.add(currentCharacterKey);
-
-                    // Sincronizar votos de todas las rondas
-                    if (sData.votes && typeof sData.votes === 'object') {
-                        Object.keys(sData.votes).forEach(r => {
-                            if (!currentVotes[r]) currentVotes[r] = {};
-                            Object.assign(currentVotes[r], sData.votes[r]);
-                        });
-                    }
-                    if (activeRound >= 1) {
-                        const myStoredVote = localStorage.getItem("gato_vote_r" + activeRound);
-                        if (myStoredVote) {
-                            if (!currentVotes[activeRound]) currentVotes[activeRound] = {};
-                            currentVotes[activeRound][currentCharacterKey] = myStoredVote;
-                        }
-                    }
-                    localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
-                    connectedPlayers.add(currentCharacterKey);
-
-                    const isHost = (currentCharacterKey === 'damian');
-
-                    if (isHost) {
-                        // El organizador tiene la máxima prioridad en el estado de rondas
-                        if (activeRound > (sData.round || 0)) {
-                            await saveServerState();
-                        } else if (typeof sData.round === 'number' && sData.round > activeRound) {
-                            activeRound = sData.round;
-                            roundStartTimestamp = sData.startTime;
-                            localStorage.setItem("gato_active_round", activeRound);
-                            localStorage.setItem("gato_round_start", roundStartTimestamp || "");
-                        }
-                    } else {
-                        // Los demás jugadores siempre adoptan la ronda dictada por el anfitrión
-                        if (typeof sData.round === 'number' && sData.round !== activeRound) {
-                            activeRound = sData.round;
-                            roundStartTimestamp = sData.startTime;
-                            localStorage.setItem("gato_active_round", activeRound);
-                            localStorage.setItem("gato_round_start", roundStartTimestamp || "");
-                        }
-                    }
-
-                    renderHostLobby();
-                    applyStateUI();
-
-                    // Si el personaje actual no estaba en la nube, registrarlo
-                    if (!sData.connected || !sData.connected.includes(currentCharacterKey)) {
-                        await saveServerState();
-                    }
-                }
-            } catch (err) {
-                // En caso de fallo de red puntual, el estado local no se altera
-            } finally {
-                isSyncing = false;
-            }
-        }
-
         async function triggerRound(roundNum) {
             activeRound = roundNum;
             roundStartTimestamp = (roundNum === 0) ? null : Date.now();
@@ -787,7 +840,13 @@
             applyStateUI();
             renderHostLobby();
             renderVotingBox();
-            await saveServerState();
+
+            broadcastGameMessage({
+                type: "ROUND_CHANGE",
+                round: activeRound,
+                startTime: roundStartTimestamp,
+                votes: currentVotes
+            });
         }
 
         function advanceNextRound() {
@@ -805,12 +864,18 @@
             localStorage.removeItem("gato_round_start");
             localStorage.removeItem("gato_votes_data");
             for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
-            connectedPlayers.clear();
-            connectedPlayers.add(currentCharacterKey);
+            connectedTimestamps = {};
+            connectedTimestamps[currentCharacterKey] = Date.now();
             applyStateUI();
             renderHostLobby();
             renderVotingBox();
-            await saveServerState();
+
+            broadcastGameMessage({
+                type: "RESET_GAME",
+                round: 0,
+                startTime: null,
+                votes: {}
+            });
         }
 
         function applyStateUI() {
@@ -818,7 +883,7 @@
             const activeGameBox = document.getElementById('active-game-box');
             const pregameCountEl = document.getElementById('pregame-count');
 
-            if (pregameCountEl) pregameCountEl.innerText = connectedPlayers.size;
+            if (pregameCountEl) pregameCountEl.innerText = getConnectedCount();
 
             if (activeRound === 0) {
                 if (preGameBox) preGameBox.classList.remove('hidden');
@@ -859,7 +924,7 @@
         }
 
         function renderHostLobby() {
-            const count = connectedPlayers.size;
+            const count = getConnectedCount();
             const pregameCountEl = document.getElementById('pregame-count');
             if (pregameCountEl) pregameCountEl.innerText = count;
 
@@ -960,7 +1025,7 @@
                 container.innerHTML = "";
                 Object.keys(characters).forEach(key => {
                     const real = playerNames[key];
-                    const isConn = connectedPlayers.has(key);
+                    const isConn = isPlayerConnected(key);
                     const hasVoted = Boolean(roundVotes[key]);
                     const votedFor = hasVoted ? roundVotes[key] : null;
 
@@ -1076,7 +1141,14 @@
 
             renderVotingBox();
             renderHostLobby();
-            saveServerState();
+
+            broadcastGameMessage({
+                type: "VOTE_CAST",
+                round: activeRound,
+                voter: currentCharacterKey,
+                suspect: suspectKey,
+                votes: currentVotes
+            });
         }
 
         function updateClock() {
