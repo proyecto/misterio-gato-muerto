@@ -631,15 +631,32 @@
         let roundStartTimestamp = parseInt(localStorage.getItem("gato_round_start") || "0", 10) || null;
         let viewingRankingRound = 0; // 0 significa seguir automáticamente a activeRound
 
+        // Purgar sesiones caducadas de pruebas anteriores (más de 1 hora de antigüedad o ronda 0)
+        if (roundStartTimestamp && (Date.now() - roundStartTimestamp > 3600 * 1000)) {
+            activeRound = 0;
+            roundStartTimestamp = null;
+            localStorage.setItem("gato_active_round", "0");
+            localStorage.removeItem("gato_round_start");
+            localStorage.removeItem("gato_votes_data");
+            for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
+        }
+
+        let currentVotes = {};
+        if (activeRound >= 1) {
+            try {
+                const rawVotes = localStorage.getItem("gato_votes_data");
+                if (rawVotes) currentVotes = JSON.parse(rawVotes);
+            } catch (e) { currentVotes = {}; }
+        } else {
+            currentVotes = {};
+            localStorage.removeItem("gato_votes_data");
+            for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
+        }
+
         function selectRankingRound(r) {
             viewingRankingRound = r;
             renderHostLobby();
         }
-        let currentVotes = {};
-        try {
-            const rawVotes = localStorage.getItem("gato_votes_data");
-            if (rawVotes) currentVotes = JSON.parse(rawVotes);
-        } catch (e) { currentVotes = {}; }
 
         function isPlayerConnected(key) {
             if (key === currentCharacterKey) return true;
@@ -727,25 +744,37 @@
                 renderVotingBox();
             }
 
-            // 5. CAMBIO DE RONDA (SOLO dictado por el anfitrión 'damian')
+            // 5. CAMBIO DE RONDA O SINCRONIZACIÓN OFICIAL DEL ANFITRIÓN
             if (msg.type === "ROUND_CHANGE" || msg.type === "STATE_SYNC") {
-                if (typeof msg.round === 'number') {
-                    const isHost = (currentCharacterKey === 'damian');
-                    if (!isHost || msg.sender === 'damian') {
-                        if (msg.round !== activeRound) {
-                            activeRound = msg.round;
-                            viewingRankingRound = activeRound;
-                            roundStartTimestamp = msg.startTime || null;
-                            localStorage.setItem("gato_active_round", activeRound);
-                            if (roundStartTimestamp) {
-                                localStorage.setItem("gato_round_start", roundStartTimestamp);
-                            } else {
-                                localStorage.removeItem("gato_round_start");
-                            }
-                            applyStateUI();
-                            renderVotingBox();
+                const isHost = (currentCharacterKey === 'damian');
+                if (!isHost || msg.sender === 'damian') {
+                    if (msg.resetTimestamp && msg.resetTimestamp > lastResetTimestamp) {
+                        lastResetTimestamp = msg.resetTimestamp;
+                        localStorage.setItem("gato_reset_timestamp", String(lastResetTimestamp));
+                    }
+                    if (typeof msg.round === 'number') {
+                        activeRound = msg.round;
+                        viewingRankingRound = activeRound;
+                        roundStartTimestamp = msg.startTime || null;
+                        localStorage.setItem("gato_active_round", String(activeRound));
+                        if (roundStartTimestamp) {
+                            localStorage.setItem("gato_round_start", String(roundStartTimestamp));
+                        } else {
+                            localStorage.removeItem("gato_round_start");
                         }
                     }
+
+                    if (activeRound === 0) {
+                        currentVotes = {};
+                        localStorage.removeItem("gato_votes_data");
+                        for (let r = 1; r <= 4; r++) localStorage.removeItem("gato_vote_r" + r);
+                    } else if (msg.type === "STATE_SYNC" && msg.votes && typeof msg.votes === 'object') {
+                        currentVotes = JSON.parse(JSON.stringify(msg.votes));
+                        localStorage.setItem("gato_votes_data", JSON.stringify(currentVotes));
+                    }
+
+                    applyStateUI();
+                    renderVotingBox();
                 }
             }
 
@@ -950,6 +979,15 @@
 
             broadcastGameMessage({
                 type: "RESET_GAME",
+                resetTimestamp: now,
+                round: 0,
+                startTime: null,
+                votes: {},
+                timestamp: now
+            });
+
+            broadcastGameMessage({
+                type: "STATE_SYNC",
                 resetTimestamp: now,
                 round: 0,
                 startTime: null,
