@@ -42,4 +42,26 @@ Juego de rol en vivo y misterio ambientado en los bajos fondos de Nueva Orleans 
 
 ---
 
+
+---
+
+## 🔍 El Crimen: ¿Quién encontró el cadáver y dónde estaba cada uno?
+
+### 🚪 El Hallazgo (Minuto 0):
+* **Quién lo descubrió:** **Thiago (Rafael amigo)**, el jefe de sala y camarero del cabaret.
+* **Por qué entró:** Tras un repentino corte de luz en el local, Thiago se dirigió al despacho privado a llevarle a Lord Blackwood la copa de oporto que le había encargado antes del apagón. Al empujar la puerta, encontró a Blackwood muerto en la alfombra con la cabeza reventada por el pisapapeles de mármol y la caja fuerte abierta.
+* **La reacción de Damián (Rafael):** Al escuchar el grito desgarrador de Thiago, Damián acudió de inmediato, confirmó el asesinato y echó el cerrojo de hierro a la puerta del club: nadie sale hasta dar con el asesino.
+
+### 📍 Ubicación de los 10 sospechosos en el momento del hallazgo:
+1. **Thiago (Rafael amigo):** En el pasillo, junto a la puerta del despacho, en shock con la copa rota en el suelo.
+2. **Damián (Rafael):** Cerca de la puerta principal y guardarropa; acudió al despacho y atrancó el local.
+3. **Vera (Encarni):** En el centro de la pista de baile con copa de champán, charlando en voz alta y llamando la atención.
+4. **Mateo (Nacho):** En la barra del bar, encendiendo con parsimonia una cerilla para su puro habano, con las mangas subidas.
+5. **Silvana (Inés):** En una mesa lateral del salón, dibujando a los músicos con carboncillo en su cuaderno.
+6. **Dafne (Nazaret):** En los sofás del reservado VIP, con su bolso de mano bien sujeto en el regazo.
+7. **Axel (Juan):** Entrando desde el callejón trasero con un trapo de taller y las manos manchadas de grasa.
+8. **Julian (Javi):** Cerca de la salida al callejón y el guardarropa, ajustándose los guantes blancos con nerviosismo.
+9. **Dra. Beatrice (Tania):** En una mesa del fondo junto a la cuna portátil de su bebé, escribiendo notas médicas.
+10. **Ylva (Gabi):** En una esquina de la barra, revisando carpetas de cuentas y recibos bajo una lamparilla.
+
 *Nota para el organizador: Las contraseñas se entregan en mano en un papel. Nadie puede salir del cabaret hasta que se resuelva el misterio y se señale al culpable.*
