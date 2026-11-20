@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cabaret El Gato Tuerto - Nueva Orleans 1923</title>
+    <!-- Cliente WebSocket MQTT de alto rendimiento (sin límites diarios de peticiones) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
     <style>
         body { background-color: #121212; color: #e0e0e0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; margin: 0; padding: 15px; line-height: 1.5; }
         .container { max-width: 680px; margin: 0 auto; background: #1e1e1e; padding: 22px; border-radius: 8px; border: 1px solid #c5a059; }
@@ -620,8 +622,50 @@
             } catch (e) { return false; }
         }
 
-        const NTFY_TOPIC = "cabaret_el_gato_tuerto_v2_clean";
+        const MQTT_BROKER = "broker.hivemq.com";
+        const MQTT_PORT = 8884;
+        const MQTT_PATH = "/mqtt";
+        const MQTT_TOPIC = "cabaret_el_gato_tuerto_2026/game";
+        let mqttClient = null;
+
         const localBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel("cabaret_gato_channel_v2") : null;
+
+        function initMQTT() {
+            if (typeof Paho === 'undefined' || !Paho.MQTT) return;
+            try {
+                const clientId = "gato_" + (currentCharacterKey || "guest") + "_" + Math.random().toString(36).substring(2, 9);
+                mqttClient = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_PATH, clientId);
+
+                mqttClient.onConnectionLost = function(responseObject) {
+                    if (responseObject.errorCode !== 0) {
+                        setTimeout(initMQTT, 3000);
+                    }
+                };
+
+                mqttClient.onMessageArrived = function(message) {
+                    try {
+                        const payload = JSON.parse(message.payloadString);
+                        handleGameMessage(payload);
+                    } catch (e) {}
+                };
+
+                mqttClient.connect({
+                    useSSL: true,
+                    timeout: 5,
+                    keepAliveInterval: 30,
+                    cleanSession: true,
+                    onSuccess: function() {
+                        mqttClient.subscribe(MQTT_TOPIC);
+                        if (currentCharacterKey) {
+                            broadcastGameMessage({ type: "HELLO" });
+                        }
+                    },
+                    onFailure: function() {
+                        setTimeout(initMQTT, 5000);
+                    }
+                });
+            } catch(e) {}
+        }
 
         // Sesión aislada por pestaña usando sessionStorage (permite abrir varias pestañas en el mismo PC)
         let currentCharacterKey = sessionStorage.getItem("gato_char_key") || "";
@@ -661,7 +705,7 @@
         function isPlayerConnected(key) {
             if (key === currentCharacterKey) return true;
             const lastSeen = connectedTimestamps[key] || 0;
-            return (Date.now() - lastSeen < 25000);
+            return (Date.now() - lastSeen < 30000);
         }
 
         function getConnectedCount() {
@@ -679,13 +723,13 @@
                 }
             } catch (e) {}
 
-            // 2. Sincronización remota en tiempo real mediante ntfy.sh (sin límites diarios)
+            // 2. Sincronización en tiempo real vía WebSocket (MQTT - Sin límites de peticiones)
             try {
-                fetch("https://ntfy.sh/" + NTFY_TOPIC, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(msg)
-                }).catch(() => {});
+                if (mqttClient && mqttClient.isConnected()) {
+                    const mqttMsg = new Paho.MQTT.Message(JSON.stringify(msg));
+                    mqttMsg.destinationName = MQTT_TOPIC;
+                    mqttClient.send(mqttMsg);
+                }
             } catch (e) {}
         }
 
@@ -802,33 +846,8 @@
                 };
             }
 
-            // Conexión Server-Sent Events (SSE) en tiempo real con ntfy.sh
-            try {
-                const es = new EventSource("https://ntfy.sh/" + NTFY_TOPIC + "/sse");
-                es.onmessage = (event) => {
-                    try {
-                        const parsed = JSON.parse(event.data);
-                        if (parsed.event === "message" && parsed.message) {
-                            handleGameMessage(JSON.parse(parsed.message));
-                        }
-                    } catch (e) {}
-                };
-            } catch (e) {}
-
-            // Recuperar mensajes recientes de ntfy.sh para reconstruir el estado actual
-            fetch("https://ntfy.sh/" + NTFY_TOPIC + "/json?poll=1&since=all")
-                .then(res => res.text())
-                .then(text => {
-                    const lines = text.trim().split("\n").filter(Boolean);
-                    lines.forEach(line => {
-                        try {
-                            const parsed = JSON.parse(line);
-                            if (parsed.event === "message" && parsed.message) {
-                                handleGameMessage(JSON.parse(parsed.message));
-                            }
-                        } catch (e) {}
-                    });
-                }).catch(() => {});
+            // Conexión WebSocket MQTT en tiempo real (sin límites de peticiones)
+            initMQTT();
 
             // Auto-login si la pestaña ya tenía sesión activa
             if (currentCharacterKey && characters[currentCharacterKey]) {
